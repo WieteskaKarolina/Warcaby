@@ -1,176 +1,333 @@
 package com.example.gameforpio;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.input.DragEvent;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
-import static java.lang.Math.abs;
 import static javafx.scene.input.MouseEvent.*;
 
-class Szachownica {
-    Rectangle[][] tiles = new Rectangle[8][8];
-    private   double size = 80;
-    private int y=35;
-    private int x=320;
-    Szachownica()
-    {
-        int kolor=0;
-        for(int i=0;i<8;i++,y+=size) {
-            x=320;
-            for (int j = 0; j < 8; j++,x+=size) {
-                Rectangle pole = new Rectangle(x, y, size, size);
-                pole.setStroke(Color.GRAY);
-                if(kolor%2==0)
-                {
-                    pole.setFill(Color.WHITE);
-                }else
-                {
-                    pole.setFill(Color.BLACK);
-                }
-                EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent e) {
-                        System.out.println("Hello World");
-                        pole.setStrokeWidth(5);
-                        pole.setStroke(Color.LIGHTBLUE);
-                    }
-                };
-                EventHandler<MouseEvent> eventHandler2 = new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent e) {
-                        System.out.println("Hello World");
-                        pole.setStrokeWidth(1);
-                        pole.setStroke(Paint.valueOf("#98b8aa"));
-                    }
-                };
-                pole.addEventHandler(MOUSE_ENTERED, eventHandler);
-                pole.addEventHandler(MOUSE_EXITED, eventHandler2);
 
-                tiles[i][j] = pole;
-                kolor++;
-            }
-            kolor++;
-        }
-    }
+class info{
+    static boolean clicked;//czy pion jest klikniety
+    static boolean isBeat=false;//czy jest bicie
 }
-class Pion{
-    Circle pion;
-    int x;
-    int y;
-    int kolor;
-    double orgSceneX, orgSceneY;
-    double orgTranslateX, orgTranslateY;
-    Pion(){
-        pion=new Circle(0,0,1);
+
+class Piece extends Circle{
+    int color; //kolor piona
+    int x_current;//ktory rzad szachownicy
+    int y_current;//ktora kolumna szachownicy
+
+    Tile[][] tiles; //tablicy wszystkich pol
+    //podswietla mozliwe ruchy (bez bicia)
+
+    //podswietlenia po najechaniu myszka
+    EventHandler<MouseEvent> eventHandler = (MouseEvent e) -> {
+        setStrokeWidth(3);
+        setStroke(Color.LIGHTBLUE);
     };
-    void set(int kolor,int x,int y)
-    {
-        pion.setCenterX(x);
-        pion.setCenterY(y);
-        pion.setRadius(30);
-        if(kolor==1)
-        {
-            pion.setFill(Color.WHITE);
-        }
-        else
-        {
-            pion.setFill(Color.RED);
-        }
-        EventHandler<MouseEvent> circleOnMousePressedEventHandler =
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent t) {
-                        orgSceneX = (t.getSceneX()-t.getSceneX()%80);
-                        orgSceneY = (t.getSceneY()-t.getSceneY()%80);
-                        orgTranslateX = pion.getTranslateX();
-                        orgTranslateY = pion.getTranslateY();
+    public void unmove(){
+        if (y_current < 7) {
+            if (x_current < 7)
+                if (tiles[y_current + 1][x_current + 1].hasNoPiece()) {
+                    tiles[y_current + 1][x_current + 1].removeEventHandler(MOUSE_CLICKED, move);
+                }
+                else if(y_current<6 && x_current<6){
+                    if (tiles[y_current + 2][x_current + 2].hasNoPiece()) {
+                        tiles[y_current + 2][x_current + 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
-                };
-        EventHandler<MouseEvent> circleOnMouseDraggedEventHandler =
-                new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent t) {
-                        double offsetX = ((t.getSceneX()-t.getSceneX()%80) - orgSceneX);
-                        double offsetY = ((t.getSceneY()-t.getSceneY()%80) - orgSceneY);
-                        if(abs(offsetY)==abs(offsetX))
-                        {
-                            double newTranslateX = orgTranslateX + offsetX;
-                            double newTranslateY = orgTranslateY + offsetY;
-                            pion.setTranslateX(newTranslateX);
-                            pion.setTranslateY(newTranslateY);
-                        }
-
+                }
+            if (x_current > 0)
+                if (tiles[y_current + 1][x_current - 1].hasNoPiece()) {
+                    tiles[y_current + 1][x_current - 1].removeEventHandler(MOUSE_CLICKED, move);
+                }
+                else if(y_current<6 && x_current>1){
+                    if (tiles[y_current + 2][x_current - 2].hasNoPiece()) {
+                        tiles[y_current + 2][x_current - 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
-                };
-        pion.setOnMousePressed(circleOnMousePressedEventHandler);
-        pion.setOnMouseDragged(circleOnMouseDraggedEventHandler);
+                }
+        }
+        if (y_current > 0) {
+            if (x_current < 7)
+                if (tiles[y_current - 1][x_current + 1].hasNoPiece()) {
+                    tiles[y_current - 1][x_current + 1].removeEventHandler(MOUSE_CLICKED, move);
+                }
+                else if(y_current>1 && x_current<6){
+                    if (tiles[y_current - 2][x_current + 2].hasNoPiece()) {
+                        tiles[y_current - 2][x_current + 2].removeEventHandler(MOUSE_CLICKED, move);
+                    }
+                }
+            if (x_current > 0)
+                if (tiles[y_current - 1][x_current - 1].hasNoPiece()) {
+                    tiles[y_current - 1][x_current - 1].removeEventHandler(MOUSE_CLICKED, move);
+                }
+                else if(y_current>1 && x_current>1){
+                    if (tiles[y_current - 2][x_current - 2].hasNoPiece()) {
+                        tiles[y_current - 2][x_current - 2].removeEventHandler(MOUSE_CLICKED, move);
+                    }
+                }
+        }
     }
-}
+    //zgasza po wyjechaniu myszka
+    EventHandler<MouseEvent> eventHandler2 = e -> setStrokeWidth(0);
+    //po kliknieciu na podswietlony Tile przemieszcza pionek na odpowiedni Tile
+    EventHandler<MouseEvent> move = ev -> {
+        if (info.clicked) {
+            clear();
+            unmove();
+        }
+        Tile tile = (Tile) ev.getSource();
+        System.out.println(y_current+x_current+tile.i+ tile.j );
+        HelloApplication.movePieceFromOneTileToAnother(y_current, x_current, tile.i, tile.j);
+        info.clicked = true;
+        unmove();
+    };
 
-public class HelloApplication extends Application {
+    SimpleObjectProperty<EventHandler<MouseEvent>> path = new SimpleObjectProperty<>(this, "path", new EventHandler<>() //podswietla mozliwe ruchy (bez bicia)
+    {
+        @Override
+        public void handle(MouseEvent e) {
 
-    public void start(Stage primaryStage) {
+            if (info.clicked) {
+                clear();
+                unmove();
+            }
 
-        Group root = new Group();
+            if (y_current < 7) {
+                if (x_current < 7)
+                    if (tiles[y_current + 1][x_current + 1].hasNoPiece()) {
+                        tiles[y_current + 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
+                        tiles[y_current + 1][x_current + 1].setStroke(Color.BLUE);
+                        tiles[y_current + 1][x_current + 1].setStrokeWidth(5);
+                    }
+                    else if(y_current<6 && x_current<6){
+                        if (tiles[y_current + 2][x_current + 2].hasNoPiece()) {
+                            tiles[y_current + 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
+                            info.isBeat=true;
+                            tiles[y_current + 2][x_current + 2].setStroke(Color.BLUE);
+                            tiles[y_current + 2][x_current + 2].setStrokeWidth(5);
+                        }
+                    }
+                if (x_current > 0)
+                    if (tiles[y_current + 1][x_current - 1].hasNoPiece()) {
+                        tiles[y_current + 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
+                        tiles[y_current + 1][x_current - 1].setStroke(Color.BLUE);
+                        tiles[y_current + 1][x_current - 1].setStrokeWidth(5);
+                    }
+                    else if(y_current<6 && x_current>1){
+                        if (tiles[y_current + 2][x_current - 2].hasNoPiece()) {
+                            tiles[y_current + 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
+                            info.isBeat=true;
+                            tiles[y_current + 2][x_current - 2].setStroke(Color.BLUE);
+                            tiles[y_current + 2][x_current - 2].setStrokeWidth(5);
+                        }
+                    }
+            }
+            if (y_current > 0) {
+                if (x_current < 7)
+                    if (tiles[y_current - 1][x_current + 1].hasNoPiece()) {
+                        tiles[y_current - 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
+                        tiles[y_current - 1][x_current + 1].setStroke(Color.BLUE);
+                        tiles[y_current - 1][x_current + 1].setStrokeWidth(5);
+                    }
+                    else if(y_current>1 && x_current<6){
+                        if (tiles[y_current - 2][x_current + 2].hasNoPiece()) {
+                            tiles[y_current - 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
+                            info.isBeat=true;
+                            tiles[y_current - 2][x_current + 2].setStroke(Color.BLUE);
+                            tiles[y_current - 2][x_current + 2].setStrokeWidth(5);
+                        }
+                    }
+                if (x_current > 0)
+                    if (tiles[y_current - 1][x_current - 1].hasNoPiece()) {
+                        tiles[y_current - 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
+                        tiles[y_current - 1][x_current - 1].setStroke(Color.BLUE);
+                        tiles[y_current - 1][x_current - 1].setStrokeWidth(5);
+                    }
+                    else if(y_current>1 && x_current>1){
+                        if (tiles[y_current - 2][x_current - 2].hasNoPiece()) {
+                            tiles[y_current - 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
+                            info.isBeat=true;
+                            tiles[y_current - 2][x_current - 2].setStroke(Color.BLUE);
+                            tiles[y_current - 2][x_current - 2].setStrokeWidth(5);
+                        }
+                    }
+            }
+            setStrokeWidth(0);
+            info.clicked = true;
+        }
+    });
 
-        int height = 1080;
-        int width = 1920;
-        AnchorPane tileMap = new AnchorPane();
-        Scene content = new Scene(tileMap, 1280, 720);
-        primaryStage.setScene(content);
-        Szachownica szachownica = new Szachownica();
+
+    void clear() //przywraca pola do punktu zero
+    {
         for(int i=0;i<8;i++)
         {
             for(int j=0;j<8;j++)
             {
-                tileMap.getChildren().add(szachownica.tiles[i][j]);
+                tiles[i][j].setStroke(Color.CRIMSON);
+                tiles[i][j].setStrokeWidth(2);
             }
         }
-        Pion [][] biale = new Pion[3][4];
-        Pion [][] czarne = new Pion[3][4];
-        int x=402;
-        int y=35;
-        int offset=-80;
-        for(int i=0;i<3;i++)
+    }
+    public Piece(int color, int x, int y,Tile[][] tiles,int i,int j) //przyjmuje color(1,0), wsporzedne, tablice pol, rzad,kolumne
+    {
+        setCenterX(x);
+        setCenterY(y);
+        setRadius(25);
+        this.color=color;
+        this.y_current =i;
+        this.x_current =j;
+        this.tiles=tiles;
+        if(color==1)
         {
-            if(i==1)
-            {
-                x=320;
-                offset=80;
-            }
-            else
-            {
-                x=400;
-                offset=-80;
-            }
-            for(int j=0;j<4;j++)
-            {
-                Pion pionb = new Pion();
-                biale[i][j]=pionb;
-                biale[i][j].set(1,x+40,y+40);
-                tileMap.getChildren().add(biale[i][j].pion);
-                Pion pionc = new Pion();
-                czarne[i][j]=pionc;
-                czarne[i][j].set(2,x+40+offset,y+40+400);
-                tileMap.getChildren().add(czarne[i][j].pion);
-                x+=80*2;
-            }
-            y+=80;
+            setFill(new ImagePattern(new Image("/Pionek_Ciemny.png")));
         }
-        primaryStage.show();
+        else {
+            setFill(new ImagePattern(new Image("/Pionek_Jasny.png")));
+        }
+        this.addEventHandler(MOUSE_ENTERED, eventHandler);
+        this.addEventHandler(MOUSE_EXITED, eventHandler2);
+        this.addEventHandler(MOUSE_CLICKED, path.get());
+
     }
 
+}
+
+class Tile extends Rectangle
+{
+    public int i;
+    public int j;
+
+    Piece piece; //pion na polu
+    public boolean hasNoPiece() // sprawdza czy ma pionka na sobie
+    {
+        return piece == null;
+    }
+    public void deletePiece(){
+        this.piece = null;
+    }
+    public Tile(int kolor,int x,int y,int size, int i, int j) //przyjmuje kolor pola , wsporzedne i rozmiar
+    {
+        setWidth(size);
+        setHeight(size);
+        setStroke(Color.CRIMSON);
+        setStrokeWidth(2);
+        relocate(x,y);
+        this.i = i;
+        this.j = j;
+        if(kolor%2==0)
+        {
+            setFill(Color.WHITE);
+        }else {
+            setFill(Color.BLACK);
+        }
+
+
+
+    }
+    public void setPiece(int color, int x, int y, Tile[][] tiles, int i, int j) //tworzy piona na sobie
+    {
+        piece = new Piece(color,x,y,tiles,i, j);
+    }
+
+
+
+}
+
+
+
+class Board {
+    Tile[][] tiles = new Tile[8][8]; //wszystkie pola
+
+
+
+    Board()
+    {
+        int color=0; //odpowiada za kolor pól
+        int size = 80;//rozmiar pola
+        int y = 35; //poczatkowy y
+        for(int i = 0; i<8; i++, y += size) {
+            int x = 320;//poczatkowy x
+            for (int j = 0; j < 8; j++, x += size) {
+                Tile tile= new Tile(color, x, y, size,i,j);
+                tiles[i][j] = tile;
+                if((i%2==0&&j%2!=0)||(i%2!=0&&j%2==0)) //czy pole jest czarne
+                {
+                    if(i<3) //czy gora dla czarnych
+                        tile.setPiece(1, x +40, y +40,tiles,i,j);
+                    if(i>4) // czy dol dla bialych
+                        tile.setPiece(2, x +40, y +40,tiles,i,j);
+                }
+                color++;
+
+
+            }
+            color++;
+        }
+    }
+
+
+
+}
+
+
+public class HelloApplication extends Application {
+
+    static AnchorPane tileMap = new AnchorPane();
+    static Board board = new Board();
+
+    public void start(Stage primaryStage) {
+
+        Scene content = new Scene(tileMap, 1280, 720);
+        primaryStage.setScene(content);
+        info.clicked=false;
+
+        for(int i=0;i<8;i++)
+        {
+            for(int j=0;j<8;j++)
+            {
+                tileMap.getChildren().add(board.tiles[i][j]);
+                if((i%2==0&&j%2!=0)||(i%2!=0&&j%2==0)) //dodaje odpowiednie pola jako dzieci
+                {
+                    if(i<3)
+                        tileMap.getChildren().add(board.tiles[i][j].piece);
+                    if(i>4)
+                        tileMap.getChildren().add(board.tiles[i][j].piece);
+                }
+
+            }
+
+        }
+        primaryStage.show();
+
+    }
+    public static void movePieceFromOneTileToAnother(int old_i, int old_j, int i, int j) {
+        int size = 80;//rozmiar pola
+        int y = 35+(i*size)+40; //poczatkowy y
+        int x = 320+(j*size)+40;//poczatkowy x
+        Piece newPiece = board.tiles[old_i][old_j].piece;
+        board.tiles[i][j].setPiece(newPiece.color, x, y, board.tiles, i,j);
+        tileMap.getChildren().add(board.tiles[i][j].piece);
+        tileMap.getChildren().remove(board.tiles[old_i][old_j].piece);
+        board.tiles[old_i][old_j].deletePiece();
+        if(info.isBeat){
+            tileMap.getChildren().remove(board.tiles[(i+old_i)/2][(j+old_j)/2].piece);
+            board.tiles[(i+old_i)/2][(j+old_j)/2].deletePiece();
+            info.isBeat=false;
+        }
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
 }
+
