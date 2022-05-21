@@ -109,7 +109,7 @@ class Piece extends Circle{
                         tiles[y_current + 1][x_current + 1].setStrokeWidth(5);
                     }
                     else if(y_current<6 && x_current<6){
-                        if (tiles[y_current + 2][x_current + 2].hasNoPiece()) {
+                        if (tiles[y_current + 2][x_current + 2].hasNoPiece() && tiles[y_current + 1][x_current + 1].piece.color!= tiles[y_current][x_current].piece.color) {
                             tiles[y_current + 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current + 2][x_current + 2].setStroke(Color.BLUE);
@@ -123,7 +123,7 @@ class Piece extends Circle{
                         tiles[y_current + 1][x_current - 1].setStrokeWidth(5);
                     }
                     else if(y_current<6 && x_current>1){
-                        if (tiles[y_current + 2][x_current - 2].hasNoPiece()) {
+                        if (tiles[y_current + 2][x_current - 2].hasNoPiece() && tiles[y_current + 1][x_current - 1].piece.color!= tiles[y_current][x_current].piece.color) {
                             tiles[y_current + 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current + 2][x_current - 2].setStroke(Color.BLUE);
@@ -139,7 +139,7 @@ class Piece extends Circle{
                         tiles[y_current - 1][x_current + 1].setStrokeWidth(5);
                     }
                     else if(y_current>1 && x_current<6){
-                        if (tiles[y_current - 2][x_current + 2].hasNoPiece()) {
+                        if (tiles[y_current - 2][x_current + 2].hasNoPiece() && tiles[y_current - 1][x_current + 1].piece.color!= tiles[y_current][x_current].piece.color) {
                             tiles[y_current - 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current - 2][x_current + 2].setStroke(Color.BLUE);
@@ -153,7 +153,7 @@ class Piece extends Circle{
                         tiles[y_current - 1][x_current - 1].setStrokeWidth(5);
                     }
                     else if(y_current>1 && x_current>1){
-                        if (tiles[y_current - 2][x_current - 2].hasNoPiece()) {
+                        if (tiles[y_current - 2][x_current - 2].hasNoPiece() && tiles[y_current - 1][x_current - 1].piece.color!= tiles[y_current][x_current].piece.color) {
                             tiles[y_current - 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current - 2][x_current - 2].setStroke(Color.BLUE);
