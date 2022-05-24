@@ -45,7 +45,7 @@ class Piece extends Circle{
                     tiles[y_current + 1][x_current + 1].removeEventHandler(MOUSE_CLICKED, move);
                 }
                 else if(y_current<6 && x_current<6){
-                    if (tiles[y_current + 2][x_current + 2].hasNoPiece()) {
+                    if (canIBeat(y_current+2,x_current+2) &&color==info.colorCanMove) {
                         tiles[y_current + 2][x_current + 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
                 }
@@ -54,7 +54,7 @@ class Piece extends Circle{
                     tiles[y_current + 1][x_current - 1].removeEventHandler(MOUSE_CLICKED, move);
                 }
                 else if(y_current<6 && x_current>1){
-                    if (tiles[y_current + 2][x_current - 2].hasNoPiece()) {
+                    if (canIBeat(y_current+2,x_current-2)&&color==info.colorCanMove) {
                         tiles[y_current + 2][x_current - 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
                 }
@@ -65,7 +65,7 @@ class Piece extends Circle{
                     tiles[y_current - 1][x_current + 1].removeEventHandler(MOUSE_CLICKED, move);
                 }
                 else if(y_current>1 && x_current<6){
-                    if (tiles[y_current - 2][x_current + 2].hasNoPiece()) {
+                    if (canIBeat(y_current-2,x_current+2)&&color==info.colorCanMove) {
                         tiles[y_current - 2][x_current + 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
                 }
@@ -74,7 +74,7 @@ class Piece extends Circle{
                     tiles[y_current - 1][x_current - 1].removeEventHandler(MOUSE_CLICKED, move);
                 }
                 else if(y_current>1 && x_current>1){
-                    if (tiles[y_current - 2][x_current - 2].hasNoPiece()) {
+                    if (canIBeat(y_current-2,x_current-2)&&color==info.colorCanMove) {
                         tiles[y_current - 2][x_current - 2].removeEventHandler(MOUSE_CLICKED, move);
                     }
                 }
@@ -82,6 +82,8 @@ class Piece extends Circle{
     }
     //zgasza po wyjechaniu myszka
     public boolean canIBeat(int new_y,int new_x){
+        if(tiles[(y_current + new_y)/2][(x_current + new_x)/2].piece==null ||tiles[y_current][x_current].piece ==null)
+            return false;
         return (tiles[(y_current + new_y)/2][(x_current + new_x)/2].piece.color!= tiles[y_current][x_current].piece.color)&&tiles[new_y][new_x].hasNoPiece()&&!tiles[(y_current + new_y)/2][(x_current + new_x)/2].hasNoPiece();
 
     }
@@ -113,6 +115,7 @@ class Piece extends Circle{
             if (info.clicked) {
                 clear();
                 unmove(); //Trochę nie wiem po co to, bez tego działa
+                info.isBeat=false;
             }
 
             if (y_current < 7) {
