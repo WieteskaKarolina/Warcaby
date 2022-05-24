@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/Warcaby.iml" filepath="$PROJECT_DIR$/.idea/Warcaby.iml" />
+      <module fileurl="file://$PROJECT_DIR$/warcaby/warcaby.iml" filepath="$PROJECT_DIR$/warcaby/warcaby.iml" />
+    </modules>
+  </component>
+</project>

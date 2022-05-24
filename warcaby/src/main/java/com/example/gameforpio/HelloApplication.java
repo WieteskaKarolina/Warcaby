@@ -27,7 +27,7 @@ class Piece extends Circle{
     int color; //kolor piona
     int x_current;//ktory rzad szachownicy
     int y_current;//ktora kolumna szachownicy
-
+    boolean isQueen = false; //Sprawdza, czy pion jest damką
     Tile[][] tiles; //tablicy wszystkich pol
     //podswietla mozliwe ruchy (bez bicia)
 
@@ -99,6 +99,20 @@ class Piece extends Circle{
         System.out.println("y: " + y_current + "x: "+x_current);
         System.out.println("c: " +color);
         HelloApplication.movePieceFromOneTileToAnother(y_current, x_current, tile.i, tile.j);
+        //Przemiana w Damke
+        if(tile.i==0 &&color ==2)
+        {
+            System.out.println("Warunek do przemiany w damke spelniony");
+            tiles[tile.i][tile.j].piece.isQueen=true;
+            tiles[tile.i][tile.j].piece.setFill(new ImagePattern(new Image("/Pionek_Jasny_Damka.png")));
+        }
+        if(tile.i==7 &&color ==1)
+        {
+            System.out.println("Warunek do przemiany w damke ciemna spelniony");
+            tiles[tile.i][tile.j].piece.isQueen=true;
+            tiles[tile.i][tile.j].piece.setFill(new ImagePattern(new Image("/Pionek_Ciemny_Damka.png")));
+        }
+
         info.clicked = true;
         //Zamiana tur
         info.whiteTurn= !info.whiteTurn; // <-- To jest w sumie niepotrzebne, siedzi tu dla picu
@@ -195,7 +209,7 @@ class Piece extends Circle{
             }
         }
     }
-    public Piece(int color, int x, int y,Tile[][] tiles,int i,int j) //przyjmuje color(1,0), wsporzedne, tablice pol, rzad,kolumne
+    public Piece(int color, int x, int y,Tile[][] tiles,int i,int j,boolean queen) //przyjmuje color(1,0), wsporzedne, tablice pol, rzad,kolumne
     {
         setCenterX(x);
         setCenterY(y);
@@ -204,12 +218,23 @@ class Piece extends Circle{
         this.y_current =i;
         this.x_current =j;
         this.tiles=tiles;
-        if(color==1)
+        if(color==1&&!isQueen)
         {
             setFill(new ImagePattern(new Image("/Pionek_Ciemny.png")));
         }
-        else {
+        else if (color==2&&!isQueen) {
             setFill(new ImagePattern(new Image("/Pionek_Jasny.png")));
+        }
+        if(isQueen)
+        {
+            if(color==1)
+            {
+                setFill(new ImagePattern(new Image("/Pionek_Ciemny_Damka.png")));
+            }
+            if(color==2)
+            {
+                setFill(new ImagePattern(new Image("/Pionek_Jasny_Damka.png")));
+            }
         }
         this.addEventHandler(MOUSE_ENTERED, eventHandler);
         this.addEventHandler(MOUSE_EXITED, eventHandler2);
@@ -251,9 +276,9 @@ class Tile extends Rectangle
 
 
     }
-    public void setPiece(int color, int x, int y, Tile[][] tiles, int i, int j) //tworzy piona na sobie
+    public void setPiece(int color, int x, int y, Tile[][] tiles, int i, int j,boolean queen) //tworzy piona na sobie
     {
-        piece = new Piece(color,x,y,tiles,i, j);
+        piece = new Piece(color,x,y,tiles,i, j,queen);
     }
 
 
@@ -280,9 +305,9 @@ class Board {
                 if((i%2==0&&j%2!=0)||(i%2!=0&&j%2==0)) //czy pole jest czarne
                 {
                     if(i<3) //czy gora dla czarnych
-                        tile.setPiece(1, x +40, y +40,tiles,i,j);
+                        tile.setPiece(1, x +40, y +40,tiles,i,j,false);
                     if(i>4) // czy dol dla bialych
-                        tile.setPiece(2, x +40, y +40,tiles,i,j);
+                        tile.setPiece(2, x +40, y +40,tiles,i,j,false);
                 }
                 color++;
 
@@ -332,7 +357,25 @@ public class HelloApplication extends Application {
         int y = 35+(i*size)+40; //poczatkowy y
         int x = 320+(j*size)+40;//poczatkowy x
         Piece newPiece = board.tiles[old_i][old_j].piece;
-        board.tiles[i][j].setPiece(newPiece.color, x, y, board.tiles, i,j);
+        System.out.println("Old piece queen: "+ board.tiles[old_i][old_j].piece.isQueen);
+        System.out.println("New piece queen: "+ newPiece.isQueen);
+        board.tiles[i][j].setPiece(newPiece.color, x, y, board.tiles, i,j, board.tiles[old_i][old_j].piece.isQueen);
+        //Zastanawiam sie, czy da sie to ustawic w jakis inny prostszy sposob albo w innym miejscu ale no
+        //Tutaj to musialm polozyc bo inaczej przemiana w damke nie dzialala, po wyjsciu z pola zmieniala sie
+        //w zwykły pion
+        if(newPiece.isQueen)
+        {
+            board.tiles[i][j].piece.isQueen=true;
+            if( board.tiles[i][j].piece.color==1)
+            {
+                board.tiles[i][j].piece.setFill(new ImagePattern(new Image("/Pionek_Ciemny_Damka.png")));
+            }
+            if( board.tiles[i][j].piece.color==2)
+            {
+                board.tiles[i][j].piece.setFill(new ImagePattern(new Image("/Pionek_Jasny_Damka.png")));
+            }
+        }
+        //
         tileMap.getChildren().add(board.tiles[i][j].piece);
         tileMap.getChildren().remove(board.tiles[old_i][old_j].piece);
         board.tiles[old_i][old_j].deletePiece();
