@@ -19,6 +19,8 @@ import static javafx.scene.input.MouseEvent.*;
 class info{
     static boolean clicked;//czy pion jest klikniety
     static boolean isBeat=false;//czy jest bicie
+    static boolean whiteTurn=true; //Czy jest tura białych
+    static int colorCanMove=2; // Kolor, ktory moze sie poruszac 2-jasne 1-ciemne
 }
 
 class Piece extends Circle{
@@ -31,8 +33,10 @@ class Piece extends Circle{
 
     //podswietlenia po najechaniu myszka
     EventHandler<MouseEvent> eventHandler = (MouseEvent e) -> {
+        if(color==info.colorCanMove){
         setStrokeWidth(3);
         setStroke(Color.LIGHTBLUE);
+        }
     };
     public void unmove(){
         if (y_current < 7) {
@@ -89,31 +93,37 @@ class Piece extends Circle{
             unmove();
         }
         Tile tile = (Tile) ev.getSource();
-        System.out.println(y_current+x_current+tile.i+ tile.j );
+        //System.out.println(y_current+x_current+tile.i+ tile.j );
+        System.out.println("y: " + y_current + "x: "+x_current);
+        System.out.println("c: " +color);
         HelloApplication.movePieceFromOneTileToAnother(y_current, x_current, tile.i, tile.j);
         info.clicked = true;
+        //Zamiana tur
+        info.whiteTurn= !info.whiteTurn; // <-- To jest w sumie niepotrzebne, siedzi tu dla picu
+        if(info.colorCanMove==1)info.colorCanMove=2;
+        else if(info.colorCanMove==2) {info.colorCanMove=1;}
         unmove();
     };
 
     SimpleObjectProperty<EventHandler<MouseEvent>> path = new SimpleObjectProperty<>(this, "path", new EventHandler<>() //podswietla mozliwe ruchy (bez bicia)
-    {
+    { //Poruszanie się i podświetlanie bloków, na które możemy się ruszyć.
         @Override
         public void handle(MouseEvent e) {
 
             if (info.clicked) {
                 clear();
-                unmove();
+                unmove(); //Trochę nie wiem po co to, bez tego działa
             }
 
             if (y_current < 7) {
                 if (x_current < 7)
-                    if (tiles[y_current + 1][x_current + 1].hasNoPiece()) {
+                    if (tiles[y_current + 1][x_current + 1].hasNoPiece()&&color==info.colorCanMove) {
                         tiles[y_current + 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
                         tiles[y_current + 1][x_current + 1].setStroke(Color.BLUE);
                         tiles[y_current + 1][x_current + 1].setStrokeWidth(5);
                     }
                     else if(y_current<6 && x_current<6){
-                        if (canIBeat(y_current+2,x_current+2)) {
+                        if (canIBeat(y_current+2,x_current+2) &&color==info.colorCanMove) {
                             tiles[y_current + 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current + 2][x_current + 2].setStroke(Color.BLUE);
@@ -121,13 +131,13 @@ class Piece extends Circle{
                         }
                     }
                 if (x_current > 0)
-                    if (tiles[y_current + 1][x_current - 1].hasNoPiece()) {
+                    if (tiles[y_current + 1][x_current - 1].hasNoPiece()&&color==info.colorCanMove) {
                         tiles[y_current + 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
                         tiles[y_current + 1][x_current - 1].setStroke(Color.BLUE);
                         tiles[y_current + 1][x_current - 1].setStrokeWidth(5);
                     }
                     else if(y_current<6 && x_current>1){
-                        if (canIBeat(y_current+2,x_current-2)) {
+                        if (canIBeat(y_current+2,x_current-2)&&color==info.colorCanMove) {
                             tiles[y_current + 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current + 2][x_current - 2].setStroke(Color.BLUE);
@@ -137,13 +147,13 @@ class Piece extends Circle{
             }
             if (y_current > 0) {
                 if (x_current < 7)
-                    if (tiles[y_current - 1][x_current + 1].hasNoPiece()) {
+                    if (tiles[y_current - 1][x_current + 1].hasNoPiece()&&color==info.colorCanMove) {
                         tiles[y_current - 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
                         tiles[y_current - 1][x_current + 1].setStroke(Color.BLUE);
                         tiles[y_current - 1][x_current + 1].setStrokeWidth(5);
                     }
                     else if(y_current>1 && x_current<6){
-                        if (canIBeat(y_current-2,x_current+2)) {
+                        if (canIBeat(y_current-2,x_current+2)&&color==info.colorCanMove) {
                             tiles[y_current - 2][x_current + 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current - 2][x_current + 2].setStroke(Color.BLUE);
@@ -151,13 +161,13 @@ class Piece extends Circle{
                         }
                     }
                 if (x_current > 0)
-                    if (tiles[y_current - 1][x_current - 1].hasNoPiece()) {
+                    if (tiles[y_current - 1][x_current - 1].hasNoPiece()&&color==info.colorCanMove) {
                         tiles[y_current - 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
                         tiles[y_current - 1][x_current - 1].setStroke(Color.BLUE);
                         tiles[y_current - 1][x_current - 1].setStrokeWidth(5);
                     }
                     else if(y_current>1 && x_current>1){
-                        if (canIBeat(y_current-2,x_current-2)) {
+                        if (canIBeat(y_current-2,x_current-2)&&color==info.colorCanMove) {
                             tiles[y_current - 2][x_current - 2].addEventHandler(MOUSE_CLICKED, move);
                             info.isBeat=true;
                             tiles[y_current - 2][x_current - 2].setStroke(Color.BLUE);
