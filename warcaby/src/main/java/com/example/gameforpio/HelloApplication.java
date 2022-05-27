@@ -1,26 +1,72 @@
 package com.example.gameforpio;
 
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import static java.lang.Math.abs;
-import static javafx.scene.input.MouseEvent.*;
-
 
 public class HelloApplication extends Application {
 
     static AnchorPane tileMap = new AnchorPane();
     static Board board = new Board();
 
+    public static void removePieceFromTile( int y, int x){
+            tileMap.getChildren().remove(board.tiles[y][x].piece);
+            board.tiles[y][x].deletePiece();
+
+    }
+    public static void removePieceFromTileQueen(int old_y, int old_x, int y, int x){
+        if(old_x<x && old_y<y){
+            while(old_x!=x && old_y!=y){
+                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                    tileMap.getChildren().remove(board.tiles[y][x].piece);
+                    board.tiles[y][x].deletePiece();
+                    break;
+                }
+                x--;
+                y--;
+            }
+        }
+        if(old_x>x && old_y<y){
+            while(old_x!=x && old_y!=y){
+                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                    tileMap.getChildren().remove(board.tiles[y][x].piece);
+                    board.tiles[y][x].deletePiece();
+                    break;
+                }
+                x++;
+                y--;
+            }
+        }
+        if(old_x<x && old_y>y){
+            while(old_x!=x && old_y!=y){
+                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                    tileMap.getChildren().remove(board.tiles[y][x].piece);
+                    board.tiles[y][x].deletePiece();
+                    break;
+                }
+                x--;
+                y++;
+            }
+        }
+        if(old_x<x && old_y<y){
+            while(old_x!=x && old_y!=y){
+                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                    tileMap.getChildren().remove(board.tiles[y][x].piece);
+                    board.tiles[y][x].deletePiece();
+                    break;
+                }
+                x--;
+                y--;
+            }
+        }
+        removePieceFromTile(old_y, old_x);
+
+    }
     public static void movePieceFromOneTileToAnother(int old_i, int old_j, int i, int j) {
         int size = 80;//rozmiar pola
         int y = 35 + (i * size) + 40; //poczatkowy y
@@ -42,12 +88,10 @@ public class HelloApplication extends Application {
         }
         //
         tileMap.getChildren().add(board.tiles[i][j].piece);
-        tileMap.getChildren().remove(board.tiles[old_i][old_j].piece);
-        board.tiles[old_i][old_j].deletePiece();
-        if (Logic.isBeat) {
-            tileMap.getChildren().remove(board.tiles[(i + old_i) / 2][(j + old_j) / 2].piece);
-            board.tiles[(i + old_i) / 2][(j + old_j) / 2].deletePiece();
-        }
+
+        if (Logic.isBeatPiece)removePieceFromTile((i + old_i) / 2,(j + old_j) / 2);
+        if(Logic.canBeatQueen)removePieceFromTileQueen(old_i, old_j, i , j);
+        else removePieceFromTile(old_i, old_j);
     }
 
     public static void main(String[] args) {

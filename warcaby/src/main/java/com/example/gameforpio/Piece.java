@@ -12,8 +12,8 @@ import static javafx.scene.input.MouseEvent.*;
 
 class Piece extends Circle {
     Colors color; //kolor piona
-    int x_current;//ktory rzad szachownicy
-    int y_current;//ktora kolumna szachownicy
+    int xCurrent;//ktory rzad szachownicy
+    int yCurrent;//ktora kolumna szachownicy
     boolean isQueen; //Sprawdza, czy pion jest damkÄ…
     Tile[][] tiles; //tablicy wszystkich pol
 
@@ -33,8 +33,8 @@ class Piece extends Circle {
         setCenterY(y);
         setRadius(25);
         this.color = color;
-        this.y_current = i;
-        this.x_current = j;
+        this.yCurrent = i;
+        this.xCurrent = j;
         this.tiles = tiles;
         this.isQueen = queen;
         System.out.println(i + "  " + j);
@@ -56,7 +56,7 @@ class Piece extends Circle {
         this.addEventHandler(MOUSE_CLICKED, path);
     }
 
-    public void unmove() {
+    public void removeHandlerMove() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 tiles[i][j].removeEventHandler(MOUSE_CLICKED, move);
@@ -72,15 +72,24 @@ class Piece extends Circle {
 
     }    //po kliknieciu na podswietlony Tile przemieszcza pionek na odpowiedni Tile
 
+
+    public void makeHighlighted(int y, int x){
+        tiles[y][x].addEventHandler(MOUSE_CLICKED, move);
+        tiles[y][x].setStroke(Color.BLUE);
+        tiles[y][x].setStrokeWidth(5);
+    }
+
     EventHandler<MouseEvent> move = ev -> {
         if (Logic.clicked) {
             clear();
-            unmove();
+            removeHandlerMove();
         }
         Tile tile = (Tile) ev.getSource();
-        System.out.println("y: " + y_current + "x: " + x_current);
+        System.out.println("y: " + yCurrent + "x: " + xCurrent);
         System.out.println("c: " + color);
-        Logic.isBeat = abs(Logic.actualpiecey - tile.i) == 2;//przypisanie czy wystepuje bicie po przesunieciu w y
+        //trzeba zoabczyc czy isQueeen dziala
+        if(!isQueen) Logic.isBeatPiece = abs(Logic.actualpiecey - tile.i) == 2;//przypisanie czy wystepuje bicie po przesunieciu w y
+        else Logic.canBeatQueen = abs(Logic.actualpiecey - tile.i) >= 2;
         HelloApplication.movePieceFromOneTileToAnother(Logic.actualpiecey, Logic.actualpiecex, tile.i, tile.j);
         //Przemiana w Damke
 
@@ -98,91 +107,148 @@ class Piece extends Circle {
         Logic.clicked = false;
         //Zamiana tur
         int bicia = 0;
-        if (Logic.isBeat)
-            bicia = possiblecapture(tile.i, tile.j);
+        if (Logic.isBeatPiece)
+            bicia = possibleCapture(tile.i, tile.j);
         if (bicia == 0) {
             if (Logic.colorCanMove == Colors.DARK)
                 Logic.colorCanMove = Colors.LIGHT;
             else
                 Logic.colorCanMove = Colors.DARK;
-            Logic.isBeat = false;
+            Logic.isBeatPiece = false;
         }
-        unmove();
+        removeHandlerMove();
     };
 
-    int possiblemoves() {
+    int possibleMovesPiece() {
         int flag = 0;
-        if (color == Colors.DARK && !isQueen) {
-            if (y_current < 7) {
-                if (x_current < 7)
-                    if (tiles[y_current + 1][x_current + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                        tiles[y_current + 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
-                        tiles[y_current + 1][x_current + 1].setStroke(Color.BLUE);
-                        tiles[y_current + 1][x_current + 1].setStrokeWidth(5);
+        if (color == Colors.DARK) {
+            if (yCurrent < 7) {
+                    if (xCurrent < 7 && tiles[yCurrent + 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
+                        makeHighlighted(yCurrent +1, xCurrent +1);
                         flag++;
                     }
-                if (x_current > 0)
-                    if (tiles[y_current + 1][x_current - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                        tiles[y_current + 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
-                        tiles[y_current + 1][x_current - 1].setStroke(Color.BLUE);
-                        tiles[y_current + 1][x_current - 1].setStrokeWidth(5);
+
+                    if (xCurrent > 0 && tiles[yCurrent + 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
+                        makeHighlighted(yCurrent +1, xCurrent -1);
                         flag++;
                     }
             }
         } else {
-            if (x_current < 7 && !isQueen)
-                if (tiles[y_current - 1][x_current + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    tiles[y_current - 1][x_current + 1].addEventHandler(MOUSE_CLICKED, move);
-                    tiles[y_current - 1][x_current + 1].setStroke(Color.BLUE);
-                    tiles[y_current - 1][x_current + 1].setStrokeWidth(5);
+                if (xCurrent < 7 && tiles[yCurrent - 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
+                    makeHighlighted(yCurrent -1, xCurrent +1);
                     flag++;
                 }
-            if (x_current > 0)
-                if (tiles[y_current - 1][x_current - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    tiles[y_current - 1][x_current - 1].addEventHandler(MOUSE_CLICKED, move);
-                    tiles[y_current - 1][x_current - 1].setStroke(Color.BLUE);
-                    tiles[y_current - 1][x_current - 1].setStrokeWidth(5);
+                if (xCurrent > 0 && tiles[yCurrent - 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
+                    makeHighlighted(yCurrent -1, xCurrent -1);
                     flag++;
                 }
         }
         return flag;
     }
 
-    int possiblecapture(int y, int x) {
+    int possibleMovesQueen() {
+        int flag = 0;
+        int y = yCurrent;
+        boolean AnotherColorDetector = false;
+        for (int x = xCurrent; x < 7 && y<7; x++){
+            if (tiles[y + 1][x + 1].hasNoPiece()) makeHighlighted(y+1, x+1);
+            else{
+                if(tiles[y + 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
+                else{
+                    y++; x++;
+                    if(!AnotherColorDetector && y<7 && x<7 && tiles[y + 1][x + 1].hasNoPiece()){
+                        AnotherColorDetector = true;
+                        makeHighlighted(y+1, x+1);
+                    }
+                    else break;
+                }
+            }
+            flag++;
+            y++;
+        }
+        AnotherColorDetector = false;
+        y = yCurrent;
+        for (int x = xCurrent; x > 0 && y < 7; x--){
+            if (tiles[y + 1][x - 1].hasNoPiece()) makeHighlighted(y+1, x-1);
+            else{
+                if(tiles[y + 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
+                else{
+                    y++; x--;
+                    if(!AnotherColorDetector && y<7 && x>0 && tiles[y + 1][x - 1].hasNoPiece()){
+                        AnotherColorDetector = true;
+                        makeHighlighted(y+1, x-1);
+                    }
+                    else break;
+                }
+            }
+            flag++;
+            y++;
+        }
+        AnotherColorDetector = false;
+        y = yCurrent;
+        for (int x = xCurrent; x < 7 && y > 0; x++){
+            if (tiles[y - 1][x + 1].hasNoPiece()) makeHighlighted(y-1, x+1);
+            else{
+                if(tiles[y - 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
+                else{
+                    y--; x++;
+                    if(!AnotherColorDetector && y>0 && x<7 && tiles[y - 1][x + 1].hasNoPiece()){
+                        AnotherColorDetector = true;
+                        makeHighlighted(y-1, x+1);
+                    }
+                    else break;
+                }
+            }
+            flag++;
+            y--;
+        }
+        AnotherColorDetector = false;
+        y = yCurrent;
+        for (int x = xCurrent; x > 0 && y > 0; x--){
+            if (tiles[y - 1][x - 1].hasNoPiece()) makeHighlighted(y-1, x-1);
+            else{
+                if(tiles[y - 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
+                else{
+                    y--; x--;
+                    if(!AnotherColorDetector && y>0 && x>0 && tiles[y - 1][x - 1].hasNoPiece()){
+                        AnotherColorDetector = true;
+                        makeHighlighted(y-1, x-1);
+                    }
+                }
+            }
+            flag++;
+            y--;
+        }
+        return flag;
+    }
+
+    int possibleCapture(int y, int x) {
         int flag = 0;
         if (y < 6 && x < 6) {
             if (canIBeat(y, x, y + 2, x + 2) && color == Logic.colorCanMove) {
-                tiles[y + 2][x + 2].addEventHandler(MOUSE_CLICKED, move);
-                tiles[y + 2][x + 2].setStroke(Color.BLUE);
-                tiles[y + 2][x + 2].setStrokeWidth(5);
-                possiblecapture(y + 2, x + 2);
+                makeHighlighted(y+2, x+2);
+                possibleCapture(y + 2, x + 2);
                 flag++;
             }
         }
         if (y < 6 && x > 1) {
             if (canIBeat(y, x, y + 2, x - 2) && color == Logic.colorCanMove) {
-                tiles[y + 2][x - 2].addEventHandler(MOUSE_CLICKED, move);
-                tiles[y + 2][x - 2].setStroke(Color.BLUE);
-                tiles[y + 2][x - 2].setStrokeWidth(5);
-                possiblecapture(y + 2, x - 2);
+                makeHighlighted(y+2, x-2);
+                possibleCapture(y + 2, x - 2);
                 flag++;
             }
         }
         if (y > 1 && x < 6) {
             if (canIBeat(y, x, y - 2, x + 2) && color == Logic.colorCanMove) {
-                tiles[y - 2][x + 2].addEventHandler(MOUSE_CLICKED, move);
-                tiles[y - 2][x + 2].setStroke(Color.BLUE);
-                tiles[y - 2][x + 2].setStrokeWidth(5);
-                possiblecapture(y - 2, x + 2);
+                makeHighlighted(y-2, x+2);
+                possibleCapture(y - 2, x + 2);
                 flag++;
             }
         }
         if (y > 1 && x > 1) {
             if (canIBeat(y, x, y - 2, x - 2) && color == Logic.colorCanMove) {
-                tiles[y - 2][x - 2].addEventHandler(MOUSE_CLICKED, move);
-                tiles[y - 2][x - 2].setStroke(Color.BLUE);
-                tiles[y - 2][x - 2].setStrokeWidth(5);
-                possiblecapture(y - 2, x - 2);
+                makeHighlighted(y-2, x-2);
+                possibleCapture(y - 2, x - 2);
                 flag++;
             }
         }
@@ -205,14 +271,16 @@ class Piece extends Circle {
 
             if (Logic.clicked) {
                 clear();
-                unmove(); //TrochÄ™ nie wiem po co to, bez tego dziaĹ‚a
+                removeHandlerMove();
             }
-            if (Logic.isBeat == false)
-                possiblemoves();
-            possiblecapture(y_current, x_current);
+            if (!Logic.isBeatPiece){
+                if(!isQueen)possibleMovesPiece();
+                else possibleMovesQueen();
+            }
+            if(!isQueen) possibleCapture(yCurrent, xCurrent);
             setStrokeWidth(0);
-            Logic.actualpiecex = x_current;
-            Logic.actualpiecey = y_current;
+            Logic.actualpiecex = xCurrent;
+            Logic.actualpiecey = yCurrent;
             Logic.clicked = true;
         }
     };

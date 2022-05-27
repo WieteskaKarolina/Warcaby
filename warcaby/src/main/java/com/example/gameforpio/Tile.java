@@ -3,6 +3,8 @@ package com.example.gameforpio;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
+
 class Tile extends Rectangle {
     public int i;
     public int j;
@@ -38,6 +40,7 @@ class Tile extends Rectangle {
     {
         piece = new Piece(color, x, y, tiles, i, j, queen);
     }
+
 
 
 }
