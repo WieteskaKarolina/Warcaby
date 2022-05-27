@@ -7,4 +7,6 @@ class Logic {
     static Colors colorCanMove = Colors.LIGHT; // Kolor, ktory moze sie poruszac 2-jasne 1-ciemne
     static int actualpiecex;
     static int actualpiecey;
+    static int piecetodiex;
+    static int piecetodiey;
 }

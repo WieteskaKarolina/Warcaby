@@ -15,14 +15,14 @@ public class HelloApplication extends Application {
     static Board board = new Board();
 
     public static void removePieceFromTile( int y, int x){
-            tileMap.getChildren().remove(board.tiles[y][x].piece);
-            board.tiles[y][x].deletePiece();
+        tileMap.getChildren().remove(board.tiles[y][x].piece);
+        board.tiles[y][x].deletePiece();
 
     }
     public static void removePieceFromTileQueen(int old_y, int old_x, int y, int x){
         if(old_x<x && old_y<y){
             while(old_x!=x && old_y!=y){
-                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                if(!board.tiles[y][x].hasNoPiece()){
                     tileMap.getChildren().remove(board.tiles[y][x].piece);
                     board.tiles[y][x].deletePiece();
                     break;
@@ -33,7 +33,7 @@ public class HelloApplication extends Application {
         }
         if(old_x>x && old_y<y){
             while(old_x!=x && old_y!=y){
-                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                if(!board.tiles[y][x].hasNoPiece()){
                     tileMap.getChildren().remove(board.tiles[y][x].piece);
                     board.tiles[y][x].deletePiece();
                     break;
@@ -44,7 +44,7 @@ public class HelloApplication extends Application {
         }
         if(old_x<x && old_y>y){
             while(old_x!=x && old_y!=y){
-                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                if(!board.tiles[y][x].hasNoPiece()){
                     tileMap.getChildren().remove(board.tiles[y][x].piece);
                     board.tiles[y][x].deletePiece();
                     break;
@@ -55,7 +55,7 @@ public class HelloApplication extends Application {
         }
         if(old_x<x && old_y<y){
             while(old_x!=x && old_y!=y){
-                if(board.tiles[y][x].piece.color!=board.tiles[old_y][old_x].piece.color){
+                if(!board.tiles[y][x].hasNoPiece()){
                     tileMap.getChildren().remove(board.tiles[y][x].piece);
                     board.tiles[y][x].deletePiece();
                     break;
@@ -64,7 +64,6 @@ public class HelloApplication extends Application {
                 y--;
             }
         }
-        removePieceFromTile(old_y, old_x);
 
     }
     public static void movePieceFromOneTileToAnother(int old_i, int old_j, int i, int j) {
@@ -88,10 +87,10 @@ public class HelloApplication extends Application {
         }
         //
         tileMap.getChildren().add(board.tiles[i][j].piece);
-
+        removePieceFromTile(old_i, old_j);
         if (Logic.isBeatPiece)removePieceFromTile((i + old_i) / 2,(j + old_j) / 2);
-        if(Logic.canBeatQueen)removePieceFromTileQueen(old_i, old_j, i , j);
-        else removePieceFromTile(old_i, old_j);
+        if(Logic.canBeatQueen)removePieceFromTile(Logic.piecetodiey,Logic.piecetodiex);
+
     }
 
     public static void main(String[] args) {

@@ -78,7 +78,39 @@ class Piece extends Circle {
         tiles[y][x].setStroke(Color.BLUE);
         tiles[y][x].setStrokeWidth(5);
     }
-
+    boolean queenbeat(int i,int j)
+    {
+        int iincrement=0;
+        int jincrement=0;
+        if(Logic.actualpiecey>i)
+        {
+            iincrement=1;
+        }else{
+            iincrement=-1;
+        }
+        if(Logic.actualpiecex>j)
+        {
+            jincrement=1;
+        }else{
+            jincrement=-1;
+        }
+        System.out.println(i+" "+j+" "+iincrement+" "+jincrement);
+        for(int ii=i;ii!=Logic.actualpiecey;ii=ii+iincrement)
+        {
+            for(int jj=j;jj!=Logic.actualpiecex;jj=jj+jincrement)
+            {
+                if(tiles[ii][jj].piece!=null)
+                {
+                    if(color!=tiles[ii][jj].piece.color) {
+                        Logic.piecetodiex = jj;
+                        Logic.piecetodiey = ii;
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     EventHandler<MouseEvent> move = ev -> {
         if (Logic.clicked) {
             clear();
@@ -88,8 +120,10 @@ class Piece extends Circle {
         System.out.println("y: " + yCurrent + "x: " + xCurrent);
         System.out.println("c: " + color);
         //trzeba zoabczyc czy isQueeen dziala
-        if(!isQueen) Logic.isBeatPiece = abs(Logic.actualpiecey - tile.i) == 2;//przypisanie czy wystepuje bicie po przesunieciu w y
-        else Logic.canBeatQueen = abs(Logic.actualpiecey - tile.i) >= 2;
+//przypisanie czy wystepuje bicie po przesunieciu w y
+        if(!isQueen) Logic.isBeatPiece = abs(Logic.actualpiecey - tile.i) == 2;
+        else Logic.canBeatQueen = queenbeat(tile.i,tile.j);
+        System.out.println(Logic.canBeatQueen);
         HelloApplication.movePieceFromOneTileToAnother(Logic.actualpiecey, Logic.actualpiecex, tile.i, tile.j);
         //Przemiana w Damke
 
@@ -103,7 +137,7 @@ class Piece extends Circle {
             tiles[tile.i][tile.j].piece.isQueen = true;
             tiles[tile.i][tile.j].piece.setFill(new ImagePattern(new Image("/Pionek_Ciemny_Damka.png")));
         }
-
+        System.out.println(Logic.canBeatQueen);
         Logic.clicked = false;
         //Zamiana tur
         int bicia = 0;
@@ -115,6 +149,7 @@ class Piece extends Circle {
             else
                 Logic.colorCanMove = Colors.DARK;
             Logic.isBeatPiece = false;
+            Logic.canBeatQueen=false;
         }
         removeHandlerMove();
     };
@@ -123,101 +158,104 @@ class Piece extends Circle {
         int flag = 0;
         if (color == Colors.DARK) {
             if (yCurrent < 7) {
-                    if (xCurrent < 7 && tiles[yCurrent + 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                        makeHighlighted(yCurrent +1, xCurrent +1);
-                        flag++;
-                    }
+                if (xCurrent < 7 && tiles[yCurrent + 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
+                    makeHighlighted(yCurrent +1, xCurrent +1);
+                    flag++;
+                }
 
-                    if (xCurrent > 0 && tiles[yCurrent + 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                        makeHighlighted(yCurrent +1, xCurrent -1);
-                        flag++;
-                    }
+                if (xCurrent > 0 && tiles[yCurrent + 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
+                    makeHighlighted(yCurrent +1, xCurrent -1);
+                    flag++;
+                }
             }
         } else {
-                if (xCurrent < 7 && tiles[yCurrent - 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent -1, xCurrent +1);
-                    flag++;
-                }
-                if (xCurrent > 0 && tiles[yCurrent - 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent -1, xCurrent -1);
-                    flag++;
-                }
+            if (xCurrent < 7 && tiles[yCurrent - 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
+                makeHighlighted(yCurrent -1, xCurrent +1);
+                flag++;
+            }
+            if (xCurrent > 0 && tiles[yCurrent - 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
+                makeHighlighted(yCurrent -1, xCurrent -1);
+                flag++;
+            }
         }
         return flag;
     }
 
     int possibleMovesQueen() {
         int flag = 0;
-        int y = yCurrent;
-        boolean AnotherColorDetector = false;
-        for (int x = xCurrent; x < 7 && y<7; x++){
-            if (tiles[y + 1][x + 1].hasNoPiece()) makeHighlighted(y+1, x+1);
-            else{
-                if(tiles[y + 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
-                else{
-                    y++; x++;
-                    if(!AnotherColorDetector && y<7 && x<7 && tiles[y + 1][x + 1].hasNoPiece()){
-                        AnotherColorDetector = true;
-                        makeHighlighted(y+1, x+1);
-                    }
-                    else break;
-                }
-            }
-            flag++;
-            y++;
-        }
-        AnotherColorDetector = false;
-        y = yCurrent;
-        for (int x = xCurrent; x > 0 && y < 7; x--){
-            if (tiles[y + 1][x - 1].hasNoPiece()) makeHighlighted(y+1, x-1);
-            else{
-                if(tiles[y + 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
-                else{
-                    y++; x--;
-                    if(!AnotherColorDetector && y<7 && x>0 && tiles[y + 1][x - 1].hasNoPiece()){
-                        AnotherColorDetector = true;
-                        makeHighlighted(y+1, x-1);
-                    }
-                    else break;
-                }
-            }
-            flag++;
-            y++;
-        }
-        AnotherColorDetector = false;
-        y = yCurrent;
-        for (int x = xCurrent; x < 7 && y > 0; x++){
-            if (tiles[y - 1][x + 1].hasNoPiece()) makeHighlighted(y-1, x+1);
-            else{
-                if(tiles[y - 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
-                else{
-                    y--; x++;
-                    if(!AnotherColorDetector && y>0 && x<7 && tiles[y - 1][x + 1].hasNoPiece()){
-                        AnotherColorDetector = true;
-                        makeHighlighted(y-1, x+1);
-                    }
-                    else break;
-                }
-            }
-            flag++;
-            y--;
-        }
-        AnotherColorDetector = false;
-        y = yCurrent;
-        for (int x = xCurrent; x > 0 && y > 0; x--){
-            if (tiles[y - 1][x - 1].hasNoPiece()) makeHighlighted(y-1, x-1);
-            else{
-                if(tiles[y - 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color)break;
-                else{
-                    y--; x--;
-                    if(!AnotherColorDetector && y>0 && x>0 && tiles[y - 1][x - 1].hasNoPiece()){
-                        AnotherColorDetector = true;
-                        makeHighlighted(y-1, x-1);
+        if(color==Logic.colorCanMove) {
+            int y = yCurrent;
+            boolean AnotherColorDetector = false;
+            for (int x = xCurrent; x < 7 && y < 7; x++) {
+                if (tiles[y + 1][x + 1].hasNoPiece()) makeHighlighted(y + 1, x + 1);
+                else {
+                    if (tiles[y + 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color) break;
+                    else {
+                        y++;
+                        x++;
+                        if (!AnotherColorDetector && y < 7 && x < 7 && tiles[y + 1][x + 1].hasNoPiece()) {
+                            AnotherColorDetector = true;
+                            makeHighlighted(y + 1, x + 1);
+                        } else break;
                     }
                 }
+                flag++;
+                y++;
             }
-            flag++;
-            y--;
+            AnotherColorDetector = false;
+            y = yCurrent;
+            for (int x = xCurrent; x > 0 && y < 7; x--) {
+                if (tiles[y + 1][x - 1].hasNoPiece()) makeHighlighted(y + 1, x - 1);
+                else {
+                    if (tiles[y + 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color) break;
+                    else {
+                        y++;
+                        x--;
+                        if (!AnotherColorDetector && y < 7 && x > 0 && tiles[y + 1][x - 1].hasNoPiece()) {
+                            AnotherColorDetector = true;
+                            makeHighlighted(y + 1, x - 1);
+                        } else break;
+                    }
+                }
+                flag++;
+                y++;
+            }
+            AnotherColorDetector = false;
+            y = yCurrent;
+            for (int x = xCurrent; x < 7 && y > 0; x++) {
+                if (tiles[y - 1][x + 1].hasNoPiece()) makeHighlighted(y - 1, x + 1);
+                else {
+                    if (tiles[y - 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color) break;
+                    else {
+                        y--;
+                        x++;
+                        if (!AnotherColorDetector && y > 0 && x < 7 && tiles[y - 1][x + 1].hasNoPiece()) {
+                            AnotherColorDetector = true;
+                            makeHighlighted(y - 1, x + 1);
+                        } else break;
+                    }
+                }
+                flag++;
+                y--;
+            }
+            AnotherColorDetector = false;
+            y = yCurrent;
+            for (int x = xCurrent; x > 0 && y > 0; x--) {
+                if (tiles[y - 1][x - 1].hasNoPiece()) makeHighlighted(y - 1, x - 1);
+                else {
+                    if (tiles[y - 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color) break;
+                    else {
+                        y--;
+                        x--;
+                        if (!AnotherColorDetector && y > 0 && x > 0 && tiles[y - 1][x - 1].hasNoPiece()) {
+                            AnotherColorDetector = true;
+                            makeHighlighted(y - 1, x - 1);
+                        }
+                    }
+                }
+                flag++;
+                y--;
+            }
         }
         return flag;
     }
@@ -275,7 +313,10 @@ class Piece extends Circle {
             }
             if (!Logic.isBeatPiece){
                 if(!isQueen)possibleMovesPiece();
-                else possibleMovesQueen();
+            }
+            if(!Logic.canBeatQueen)
+            {
+                if(isQueen)possibleMovesQueen();
             }
             if(!isQueen) possibleCapture(yCurrent, xCurrent);
             setStrokeWidth(0);
