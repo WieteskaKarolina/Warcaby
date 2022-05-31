@@ -140,14 +140,18 @@ class Piece extends Circle {
         System.out.println(Logic.canBeatQueen);
         Logic.clicked = false;
         //Zamiana tur
-        int bicia = 0;
-        if (Logic.isBeatPiece)
-            bicia = possibleCapture(tile.i, tile.j);
-        if (bicia == 0) {
-            if (Logic.colorCanMove == Colors.DARK)
+        int beats = 0;
+        if (Logic.isBeatPiece && !tile.piece.isQueen){
+            beats = possibleCapture(tile.i, tile.j);
+        }
+        if (beats == 0) {
+            if (Logic.colorCanMove == Colors.DARK){
                 Logic.colorCanMove = Colors.LIGHT;
-            else
+            }
+            else {
                 Logic.colorCanMove = Colors.DARK;
+            }
+            HelloApplication.infoAboutWhoMoves();
             Logic.isBeatPiece = false;
             Logic.canBeatQueen=false;
         }
