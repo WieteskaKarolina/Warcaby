@@ -1,8 +1,8 @@
 package com.example.gameforpio;
 
 public enum GameResult {
-    WHITEWINS,
-    DARKWINS,
+    WHITE_WINS,
+    DARK_WINS,
     DRAW,
     CONTINUE
 }

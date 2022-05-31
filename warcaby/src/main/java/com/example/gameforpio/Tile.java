@@ -3,24 +3,24 @@ package com.example.gameforpio;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import static javafx.scene.input.MouseEvent.MOUSE_CLICKED;
-
 class Tile extends Rectangle {
-    public int i;
-    public int j;
+    public int y;
+    public int x;
 
     Piece piece; //pion na polu
+    Colors color;
 
-    public Tile(int kolor, int x, int y, int size, int i, int j) //przyjmuje kolor pola , wsporzedne i rozmiar
+    public Tile(Colors color, int positionX, int positionY, int size, int y, int x) //przyjmuje kolor pola , wsporzedne i rozmiar
     {
+        this.color = color;
         setWidth(size);
         setHeight(size);
         setStroke(Color.CRIMSON);
         setStrokeWidth(2);
-        relocate(x, y);
-        this.i = i;
-        this.j = j;
-        if (kolor % 2 == 0) {
+        relocate(positionX, positionY);
+        this.y = y;
+        this.x = x;
+        if (color == Colors.LIGHT) {
             setFill(Color.WHITE);
         } else {
             setFill(Color.BLACK);

@@ -10,6 +10,7 @@ module com.example.warcaby {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires annotations;
 
     opens com.example.warcaby to javafx.fxml;
     exports com.example.warcaby;
