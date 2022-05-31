@@ -112,7 +112,7 @@ class Piece extends Circle {
     }
     EventHandler<MouseEvent> move = ev -> {
         if (Logic.clicked) {
-            clear();
+            clearBoard();
             removeHandlerMove();
         }
         Tile tile = (Tile) ev.getSource();
@@ -296,7 +296,7 @@ class Piece extends Circle {
         return flag;
     }
 
-    void clear() //przywraca pola do punktu zero
+    void clearBoard() //przywraca pola do punktu zero
     {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -311,7 +311,7 @@ class Piece extends Circle {
         public void handle(MouseEvent mouseEvent) {
 
             if (Logic.clicked) {
-                clear();
+                clearBoard();
                 removeHandlerMove();
             }
             if (!Logic.isBeatPiece){

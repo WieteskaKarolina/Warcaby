@@ -41,7 +41,7 @@ public class HelloApplication extends Application {
                         numOfPossibleMoves+=board.tiles[i][j].piece.possibleMovesPiece();
                     numOfPossibleMoves+=board.tiles[i][j].piece.possibleCapture(i,j);
                     board.tiles[i][j].piece.removeHandlerMove();
-                    board.tiles[i][j].piece.clear();
+                    board.tiles[i][j].piece.clearBoard();
                     }
             }
         }
