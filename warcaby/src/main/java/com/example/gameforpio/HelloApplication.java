@@ -15,6 +15,7 @@ public class HelloApplication extends Application {
 
     static AnchorPane tileMap = new AnchorPane();
     static Board board = new Board();
+    static Text infoText = new Text();
 
     public static void removePieceFromTile( int y, int x){
         tileMap.getChildren().remove(board.tiles[y][x].piece);
@@ -40,7 +41,7 @@ public class HelloApplication extends Application {
                         numOfPossibleMoves+=board.tiles[i][j].piece.possibleMovesPiece();
                     numOfPossibleMoves+=board.tiles[i][j].piece.possibleCapture(i,j);
                     board.tiles[i][j].piece.removeHandlerMove();
-                    board.tiles[i][j].piece.clear();
+                    board.tiles[i][j].piece.clearBoard();
                     }
             }
         }
@@ -88,6 +89,28 @@ public class HelloApplication extends Application {
             tileMap.getChildren().add(resultText);
         }
     }
+    public static void infoAboutWhoMoves(){
+        tileMap.getChildren().remove(infoText);
+        handleEndGame();
+        if(Logic.colorCanMove==Colors.LIGHT){
+            infoText.setText("LIGHT MOVE!");
+            infoText.setFill(Color.WHITE);
+            infoText.setStroke(Color.BLACK);
+
+        }
+        else{
+            infoText.setText("DARK MOVE!");
+            infoText.setFill(Color.BLACK);
+            infoText.setStroke(Color.WHITE);
+        }
+        infoText.setX(20.0f);
+        infoText.setY(350.0f);
+        infoText.setTextAlignment(TextAlignment.CENTER);
+        infoText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 40));
+
+        tileMap.getChildren().add(infoText);
+    }
+
     public static void removePieceFromTileQueen(int old_y, int old_x, int y, int x){
         if(old_x<x && old_y<y){
             while(old_x!=x && old_y!=y){
@@ -158,8 +181,7 @@ public class HelloApplication extends Application {
         tileMap.getChildren().add(board.tiles[i][j].piece);
         removePieceFromTile(old_i, old_j);
         if (Logic.isBeatPiece)removePieceFromTile((i + old_i) / 2,(j + old_j) / 2);
-        if(Logic.canBeatQueen)removePieceFromTile(Logic.piecetodiey,Logic.piecetodiex);
-        handleEndGame();
+        if(Logic.canBeatQueen)removePieceFromTile(Logic.pieceToRemoveY,Logic.pieceToRemoveX);
     }
 
     public static void main(String[] args) {
@@ -169,6 +191,7 @@ public class HelloApplication extends Application {
     public void start(Stage primaryStage) {
 
         Scene content = new Scene(tileMap, 1280, 720);
+        content.setFill(new ImagePattern(new Image("/backgroundImage.jpg")));
         primaryStage.setScene(content);
         Logic.clicked = false;
 
@@ -186,6 +209,7 @@ public class HelloApplication extends Application {
             }
 
         }
+        infoAboutWhoMoves();
         primaryStage.show();
 
     }
