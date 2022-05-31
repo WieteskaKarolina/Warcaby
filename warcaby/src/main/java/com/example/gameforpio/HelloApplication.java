@@ -169,6 +169,7 @@ public class HelloApplication extends Application {
     public void start(Stage primaryStage) {
 
         Scene content = new Scene(tileMap, 1280, 720);
+        content.setFill(new ImagePattern(new Image("/backgroundImage.jpg")));
         primaryStage.setScene(content);
         Logic.clicked = false;
 
