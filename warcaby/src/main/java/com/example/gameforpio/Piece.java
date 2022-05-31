@@ -78,32 +78,31 @@ class Piece extends Circle {
         tiles[y][x].setStroke(Color.BLUE);
         tiles[y][x].setStrokeWidth(5);
     }
-    boolean queenbeat(int i,int j)
-    {
-        int iincrement=0;
-        int jincrement=0;
-        if(Logic.actualpiecey>i)
+    boolean queenbeat(int i,int j) {
+        int iIncrement=0;
+        int jIncrement=0;
+        if(Logic.actualPieceY >i)
         {
-            iincrement=1;
+            iIncrement=1;
         }else{
-            iincrement=-1;
+            iIncrement=-1;
         }
-        if(Logic.actualpiecex>j)
+        if(Logic.actualPieceX >j)
         {
-            jincrement=1;
+            jIncrement=1;
         }else{
-            jincrement=-1;
+            jIncrement=-1;
         }
-        System.out.println(i+" "+j+" "+iincrement+" "+jincrement);
-        for(int ii=i;ii!=Logic.actualpiecey;ii=ii+iincrement)
+        System.out.println(i+" "+j+" "+iIncrement+" "+jIncrement);
+        for(int ii = i; ii!=Logic.actualPieceY; ii=ii+iIncrement)
         {
-            for(int jj=j;jj!=Logic.actualpiecex;jj=jj+jincrement)
+            for(int jj = j; jj!=Logic.actualPieceX; jj=jj+jIncrement)
             {
                 if(tiles[ii][jj].piece!=null)
                 {
                     if(color!=tiles[ii][jj].piece.color) {
-                        Logic.piecetodiex = jj;
-                        Logic.piecetodiey = ii;
+                        Logic.pieceToRemoveX = jj;
+                        Logic.pieceToRemoveY = ii;
                         return true;
                     }
                 }
@@ -121,10 +120,10 @@ class Piece extends Circle {
         System.out.println("c: " + color);
         //trzeba zoabczyc czy isQueeen dziala
 //przypisanie czy wystepuje bicie po przesunieciu w y
-        if(!isQueen) Logic.isBeatPiece = abs(Logic.actualpiecey - tile.i) == 2;
+        if(!isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.i) == 2;
         else Logic.canBeatQueen = queenbeat(tile.i,tile.j);
         System.out.println(Logic.canBeatQueen);
-        HelloApplication.movePieceFromOneTileToAnother(Logic.actualpiecey, Logic.actualpiecex, tile.i, tile.j);
+        HelloApplication.movePieceFromOneTileToAnother(Logic.actualPieceY, Logic.actualPieceX, tile.i, tile.j);
         //Przemiana w Damke
 
         if (tile.i == 0 && color == Colors.LIGHT) {
@@ -324,8 +323,8 @@ class Piece extends Circle {
             }
             if(!isQueen) possibleCapture(yCurrent, xCurrent);
             setStrokeWidth(0);
-            Logic.actualpiecex = xCurrent;
-            Logic.actualpiecey = yCurrent;
+            Logic.actualPieceX = xCurrent;
+            Logic.actualPieceY = yCurrent;
             Logic.clicked = true;
         }
     };

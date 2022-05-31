@@ -181,7 +181,7 @@ public class HelloApplication extends Application {
         tileMap.getChildren().add(board.tiles[i][j].piece);
         removePieceFromTile(old_i, old_j);
         if (Logic.isBeatPiece)removePieceFromTile((i + old_i) / 2,(j + old_j) / 2);
-        if(Logic.canBeatQueen)removePieceFromTile(Logic.piecetodiey,Logic.piecetodiex);
+        if(Logic.canBeatQueen)removePieceFromTile(Logic.pieceToRemoveY,Logic.pieceToRemoveX);
     }
 
     public static void main(String[] args) {
