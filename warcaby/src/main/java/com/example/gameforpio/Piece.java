@@ -123,6 +123,26 @@ class Piece extends Circle {
         return false;
     }
 
+    boolean checkCapture(int x, int y, int horizontal, int vertical){
+        if(horizontal<0){
+            if(vertical<0) {
+                return (x > 1 && y > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+            else{
+                return  (y < Checkers.board.BOARD_HEIGHT - 2 && x > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+        }
+        if(horizontal>0){
+            if(vertical<0) {
+                return (x < Checkers.board.BOARD_WIDTH - 2 && y > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 2 && x < Checkers.board.BOARD_WIDTH - 2) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+        }
+        return false;
+    }
+
     int movesPiece(int horizontal, int vertical){
         int movesCounter = 0;
         if (check(xCurrent, yCurrent, horizontal, vertical) && tiles[yCurrent + vertical][ xCurrent + horizontal].hasNoPiece() && color == Logic.colorCanMove){
@@ -185,31 +205,26 @@ class Piece extends Circle {
 
     int possibleCapture(int y, int x) {
         int possibleBeatsCounter = 0;
-        if (y < Checkers.board.BOARD_HEIGHT - 2 && x < Checkers.board.BOARD_WIDTH - 2) {
-            if (canIBeat(y, x, y + 2, x + 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y + 2, x + 2);
-                possibleCapture(y + 2, x + 2);
+        final int LEFT_CAPTURE = -2;
+        final int RIGHT_CAPTURE = 2;
+        final int DOWN_CAPTURE = -2;
+        final int UP_CAPTURE = 2;
+
+        if(color == Logic.colorCanMove){
+            if (checkCapture(x, y, LEFT_CAPTURE, DOWN_CAPTURE)) {
+                makeHighlighted(y + DOWN_CAPTURE, x + LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y < Checkers.board.BOARD_HEIGHT - 2 && x > 1) {
-            if (canIBeat(y, x, y + 2, x - 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y + 2, x - 2);
-                possibleCapture(y + 2, x - 2);
+            if (checkCapture(x, y, LEFT_CAPTURE, UP_CAPTURE)) {
+                makeHighlighted(y + UP_CAPTURE, x + LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y > 1 && x < Checkers.board.BOARD_WIDTH - 2) {
-            if (canIBeat(y, x, y - 2, x + 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y - 2, x + 2);
-                possibleCapture(y - 2, x + 2);
+            if (checkCapture(x, y, RIGHT_CAPTURE, DOWN_CAPTURE)) {
+                makeHighlighted(y + DOWN_CAPTURE, x + RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y > 1 && x > 1) {
-            if (canIBeat(y, x, y - 2, x - 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y - 2, x - 2);
-                possibleCapture(y - 2, x - 2);
+            if (checkCapture(x, y, RIGHT_CAPTURE, UP_CAPTURE)) {
+                makeHighlighted(y + UP_CAPTURE, x + RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
         }
