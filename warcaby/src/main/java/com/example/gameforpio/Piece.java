@@ -145,7 +145,7 @@ class Piece extends Circle {
 
     int movesPiece(int horizontal, int vertical){
         int movesCounter = 0;
-        if (check(xCurrent, yCurrent, horizontal, vertical) && tiles[yCurrent + vertical][ xCurrent + horizontal].hasNoPiece() && color == Logic.colorCanMove){
+        if (check(xCurrent, yCurrent, horizontal, vertical) && tiles[yCurrent + vertical][ xCurrent + horizontal].hasNoPiece()){
             makeHighlighted(yCurrent + vertical, xCurrent + horizontal);
             movesCounter++;
 
@@ -155,20 +155,16 @@ class Piece extends Circle {
 
     int possibleMovesPiece() {
         int moveCounter = 0;
-        final int LEFT = -1;
-        final int RIGHT = 1;
-        final int DOWN = -1;
-        final int UP = 1;
-
-        if (color == Colors.DARK) {
-            moveCounter+=movesPiece(RIGHT, UP);
-            moveCounter+=movesPiece(LEFT, UP);
+        if( color == Logic.colorCanMove){
+            if (color == Colors.DARK) {
+                moveCounter+=movesPiece(Logic.RIGHT, Logic.UP);
+                moveCounter+=movesPiece(Logic.LEFT, Logic.UP);
+            }
+            if (color == Colors.LIGHT){
+                moveCounter+=movesPiece(Logic.RIGHT, Logic.DOWN);
+                moveCounter+=movesPiece(Logic.LEFT, Logic.DOWN);
+            }
         }
-        if (color == Colors.LIGHT){
-            moveCounter+=movesPiece(RIGHT, DOWN);
-            moveCounter+=movesPiece(LEFT, DOWN);
-        }
-
 
         return moveCounter;
 
@@ -189,15 +185,12 @@ class Piece extends Circle {
     }
     int possibleMovesQueen() {
         int movesCounter = 0;
-        final int LEFT = -1;
-        final int RIGHT = 1;
-        final int DOWN = -1;
-        final int UP = 1;
+
         if(color==Logic.colorCanMove) {
-            movesCounter+=movesQueen(RIGHT, UP);
-            movesCounter+=movesQueen(RIGHT, DOWN);
-            movesCounter+=movesQueen(LEFT, UP);
-            movesCounter+=movesQueen(LEFT, DOWN);
+            movesCounter+=movesQueen(Logic.RIGHT, Logic.UP);
+            movesCounter+=movesQueen(Logic.RIGHT, Logic.DOWN);
+            movesCounter+=movesQueen(Logic.LEFT, Logic.UP);
+            movesCounter+=movesQueen(Logic.LEFT, Logic.DOWN);
 
         }
         return movesCounter;
@@ -205,26 +198,22 @@ class Piece extends Circle {
 
     int possibleCapture(int y, int x) {
         int possibleBeatsCounter = 0;
-        final int LEFT_CAPTURE = -2;
-        final int RIGHT_CAPTURE = 2;
-        final int DOWN_CAPTURE = -2;
-        final int UP_CAPTURE = 2;
 
         if(color == Logic.colorCanMove){
-            if (checkCapture(x, y, LEFT_CAPTURE, DOWN_CAPTURE)) {
-                makeHighlighted(y + DOWN_CAPTURE, x + LEFT_CAPTURE);
+            if (checkCapture(x, y, Logic.LEFT_CAPTURE, Logic.DOWN_CAPTURE)) {
+                makeHighlighted(y + Logic.DOWN_CAPTURE, x + Logic.LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-            if (checkCapture(x, y, LEFT_CAPTURE, UP_CAPTURE)) {
-                makeHighlighted(y + UP_CAPTURE, x + LEFT_CAPTURE);
+            if (checkCapture(x, y, Logic.LEFT_CAPTURE, Logic.UP_CAPTURE)) {
+                makeHighlighted(y + Logic.UP_CAPTURE, x + Logic.LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-            if (checkCapture(x, y, RIGHT_CAPTURE, DOWN_CAPTURE)) {
-                makeHighlighted(y + DOWN_CAPTURE, x + RIGHT_CAPTURE);
+            if (checkCapture(x, y, Logic.RIGHT_CAPTURE, Logic.DOWN_CAPTURE)) {
+                makeHighlighted(y + Logic.DOWN_CAPTURE, x + Logic.RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
-            if (checkCapture(x, y, RIGHT_CAPTURE, UP_CAPTURE)) {
-                makeHighlighted(y + UP_CAPTURE, x + RIGHT_CAPTURE);
+            if (checkCapture(x, y, Logic.RIGHT_CAPTURE, Logic.UP_CAPTURE)) {
+                makeHighlighted(y + Logic.UP_CAPTURE, x + Logic.RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
         }
@@ -261,15 +250,12 @@ class Piece extends Circle {
 
     int possibleCapturesQueen(int yposition,int xposition) {
         int captureCounter = 0;
-        final int LEFT = -1;
-        final int RIGHT = 1;
-        final int DOWN = -1;
-        final int UP = 1;
+
         if(color==Logic.colorCanMove) {
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,LEFT,UP);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,LEFT,DOWN);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,RIGHT,UP);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,RIGHT,DOWN);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.UP);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.DOWN);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.UP);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.DOWN);
         }
         return captureCounter;
     }
@@ -331,7 +317,7 @@ class Piece extends Circle {
         }
         removeHandlerMove();
     };
-    EventHandler<MouseEvent> path = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> path = new EventHandler<>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
 
