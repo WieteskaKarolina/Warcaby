@@ -274,11 +274,15 @@ class Piece extends Circle {
             removeHandlerMove();
         }
         Tile tile = (Tile) ev.getSource();
-
+        if((xCurrent!=Logic.actualPieceX&&yCurrent!=Logic.actualPieceY)||color!=Logic.colorCanMove)
+        {
+            return;
+        }
         if (!isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
         else Logic.isBeatPiece = queenBeat(tile.y, tile.x);
 
         Checkers.movePieceFromOneTileToAnother(Logic.actualPieceY, Logic.actualPieceX, tile.y, tile.x);
+        //Przemiana w Damke
         int beats = 0;
         if (Logic.isBeatPiece && !tile.piece.isQueen) {
             beats = possibleCapture(tile.y, tile.x);
@@ -292,7 +296,6 @@ class Piece extends Circle {
             Logic.actualPieceY=tile.y;
             Logic.actualPieceX=tile.x;
         }
-        //Przemiana w Damke
 
         if (tile.y == 0 && color == Colors.LIGHT) {
 
@@ -305,8 +308,10 @@ class Piece extends Circle {
         }
 
         Logic.clicked = false;
+        System.out.println(Logic.isBeatPiece);
 
         if (beats == 0) {
+            System.out.println("Zmiana tury");
             if (Logic.colorCanMove == Colors.DARK) {
                 Logic.colorCanMove = Colors.LIGHT;
             } else {
