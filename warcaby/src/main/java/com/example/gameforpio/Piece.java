@@ -103,256 +103,159 @@ class Piece extends Circle {
         return false;
     }
 
-    int possibleMovesPiece() {
-        int moveCounter = 0;
-        if (color == Colors.DARK) {
-            if (yCurrent < Checkers.board.BOARD_HEIGHT - 1) {
-                if (xCurrent < Checkers.board.BOARD_WIDTH - 1 && tiles[yCurrent + 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent + 1, xCurrent + 1);
-                    moveCounter++;
-                }
-
-                if (xCurrent > 0 && tiles[yCurrent + 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent + 1, xCurrent - 1);
-                    moveCounter++;
-                }
+    boolean check(int x, int y, int horizontal, int vertical){
+        if(horizontal<0){
+            if(vertical<0) {
+                return (x > 0 && y > 0);
             }
-        } else {
-            if (yCurrent > 0) {
-                if (xCurrent < Checkers.board.BOARD_WIDTH - 1 && tiles[yCurrent - 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent - 1, xCurrent + 1);
-                    moveCounter++;
-                }
-                if (xCurrent > 0 && tiles[yCurrent - 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent - 1, xCurrent - 1);
-                    moveCounter++;
-                }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 1 && x > 0);
             }
         }
+        if(horizontal>0){
+            if(vertical<0) {
+                return (x < Checkers.board.BOARD_WIDTH - 1 && y > 0);
+            }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 1 && x < Checkers.board.BOARD_WIDTH - 1);
+            }
+        }
+        return false;
+    }
+
+    boolean checkCapture(int x, int y, int horizontal, int vertical){
+        if(horizontal<0){
+            if(vertical<0) {
+                return (x > 1 && y > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+            else{
+                return  (y < Checkers.board.BOARD_HEIGHT - 2 && x > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+        }
+        if(horizontal>0){
+            if(vertical<0) {
+                return (x < Checkers.board.BOARD_WIDTH - 2 && y > 1) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 2 && x < Checkers.board.BOARD_WIDTH - 2) && canIBeat(y, x, y+vertical, x+horizontal);
+            }
+        }
+        return false;
+    }
+
+    int movesPiece(int horizontal, int vertical){
+        int movesCounter = 0;
+        if (check(xCurrent, yCurrent, horizontal, vertical) && tiles[yCurrent + vertical][ xCurrent + horizontal].hasNoPiece()){
+            makeHighlighted(yCurrent + vertical, xCurrent + horizontal);
+            movesCounter++;
+
+        }
+        return  movesCounter;
+    }
+
+    int possibleMovesPiece() {
+        int moveCounter = 0;
+        if( color == Logic.colorCanMove){
+            if (color == Colors.DARK) {
+                moveCounter+=movesPiece(Logic.RIGHT, Logic.UP);
+                moveCounter+=movesPiece(Logic.LEFT, Logic.UP);
+            }
+            if (color == Colors.LIGHT){
+                moveCounter+=movesPiece(Logic.RIGHT, Logic.DOWN);
+                moveCounter+=movesPiece(Logic.LEFT, Logic.DOWN);
+            }
+        }
+
         return moveCounter;
 
     }
 
+    int movesQueen(int horizontal, int vertical){
+        int movesCounter = 0;
+        for (int x = xCurrent, y = yCurrent; check(x, y, horizontal, vertical) ; x+=horizontal, y+=vertical) {
+            if (tiles[y + vertical][x + horizontal].hasNoPiece()) {
+                makeHighlighted(y + vertical,x + horizontal);
+            }
+            else {
+                break;
+            }
+            movesCounter++;
+        }
+        return  movesCounter;
+    }
     int possibleMovesQueen() {
         int movesCounter = 0;
+
         if(color==Logic.colorCanMove) {
-            int y = yCurrent;
-            boolean anotherColorDetector = false;
-            for (int x = xCurrent; x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1; x++, y++) {
-                if (tiles[y + 1][x + 1].hasNoPiece()) makeHighlighted(y + 1, x + 1);
-                else {
-                    if (tiles[y + 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color) {
-                        break;
-                    } else {
-                        y++;
-                        x++;
-                        if (!anotherColorDetector && x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1 && tiles[y + 1][x + 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y + 1, x + 1);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                movesCounter++;
-            }
-            anotherColorDetector = false;
-            y = yCurrent;
-            for (int x = xCurrent; x > 0 && y < Checkers.board.BOARD_HEIGHT - 1; x--, y++) {
-                if (tiles[y + 1][x - 1].hasNoPiece()) makeHighlighted(y + 1, x - 1);
-                else {
-                    if (tiles[y + 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color) {
-                        break;
-                    } else {
-                        y++;
-                        x--;
-                        if (!anotherColorDetector && y < Checkers.board.BOARD_HEIGHT - 1 && x > 0 && tiles[y + 1][x - 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y + 1, x - 1);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                movesCounter++;
-            }
-            anotherColorDetector = false;
-            y = yCurrent;
-            for (int x = xCurrent; x < Checkers.board.BOARD_WIDTH - 1 && y > 0; x++, y--) {
-                if (tiles[y - 1][x + 1].hasNoPiece()) makeHighlighted(y - 1, x + 1);
-                else {
-                    if (tiles[y - 1][x + 1].piece.color == tiles[yCurrent][xCurrent].piece.color) {
-                        break;
-                    } else {
-                        y--;
-                        x++;
-                        if (!anotherColorDetector && y > 0 && x < Checkers.board.BOARD_WIDTH - 1 && tiles[y - 1][x + 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y - 1, x + 1);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                movesCounter++;
-            }
-            anotherColorDetector = false;
-            y = yCurrent;
-            for (int x = xCurrent; x > 0 && y > 0; x--, y--) {
-                if (tiles[y - 1][x - 1].hasNoPiece()) makeHighlighted(y - 1, x - 1);
-                else {
-                    if (tiles[y - 1][x - 1].piece.color == tiles[yCurrent][xCurrent].piece.color) {
-                        break;
-                    } else {
-                        y--;
-                        x--;
-                        if (!anotherColorDetector && y > 0 && x > 0 && tiles[y - 1][x - 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y - 1, x - 1);
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                movesCounter++;
-            }
+            movesCounter+=movesQueen(Logic.RIGHT, Logic.UP);
+            movesCounter+=movesQueen(Logic.RIGHT, Logic.DOWN);
+            movesCounter+=movesQueen(Logic.LEFT, Logic.UP);
+            movesCounter+=movesQueen(Logic.LEFT, Logic.DOWN);
+
         }
         return movesCounter;
     }
 
     int possibleCapture(int y, int x) {
         int possibleBeatsCounter = 0;
-        if (y < Checkers.board.BOARD_HEIGHT - 2 && x < Checkers.board.BOARD_WIDTH - 2) {
-            if (canIBeat(y, x, y + 2, x + 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y + 2, x + 2);
-                possibleCapture(y + 2, x + 2);
+
+        if(color == Logic.colorCanMove){
+            if (checkCapture(x, y, Logic.LEFT_CAPTURE, Logic.DOWN_CAPTURE)) {
+                makeHighlighted(y + Logic.DOWN_CAPTURE, x + Logic.LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y < Checkers.board.BOARD_HEIGHT - 2 && x > 1) {
-            if (canIBeat(y, x, y + 2, x - 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y + 2, x - 2);
-                possibleCapture(y + 2, x - 2);
+            if (checkCapture(x, y, Logic.LEFT_CAPTURE, Logic.UP_CAPTURE)) {
+                makeHighlighted(y + Logic.UP_CAPTURE, x + Logic.LEFT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y > 1 && x < Checkers.board.BOARD_WIDTH - 2) {
-            if (canIBeat(y, x, y - 2, x + 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y - 2, x + 2);
-                possibleCapture(y - 2, x + 2);
+            if (checkCapture(x, y, Logic.RIGHT_CAPTURE, Logic.DOWN_CAPTURE)) {
+                makeHighlighted(y + Logic.DOWN_CAPTURE, x + Logic.RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
-        }
-        if (y > 1 && x > 1) {
-            if (canIBeat(y, x, y - 2, x - 2) && color == Logic.colorCanMove) {
-                makeHighlighted(y - 2, x - 2);
-                possibleCapture(y - 2, x - 2);
+            if (checkCapture(x, y, Logic.RIGHT_CAPTURE, Logic.UP_CAPTURE)) {
+                makeHighlighted(y + Logic.UP_CAPTURE, x + Logic.RIGHT_CAPTURE);
                 possibleBeatsCounter++;
             }
         }
         return possibleBeatsCounter;
     }
 
+    int capturesQueen(int y, int x,int horizontal, int vertical){
+        int captureCounter = 0;
+        boolean anotherColorDetector=false;
+        for (; check(x, y, horizontal, vertical) ; x+=horizontal, y+=vertical) {
+            if (tiles[y + vertical][x + horizontal].hasNoPiece()){
+                if(anotherColorDetector){
+                    makeHighlighted(y + vertical, x + horizontal);
+                }
+            }
+            else {
+                if (tiles[y + vertical][x + horizontal].piece.color == Logic.colorCanMove) {
+                    break;
+                } else {
+                    y+=vertical;
+                    x+=horizontal;
+                    if (!anotherColorDetector && check(x, y, horizontal, vertical)&& tiles[y + vertical][x + horizontal].hasNoPiece()) {
+                        anotherColorDetector = true;
+                        makeHighlighted(y + vertical, x + horizontal);
+                        captureCounter++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+        return  captureCounter;
+    }
+
     int possibleCapturesQueen(int yposition,int xposition) {
         int captureCounter = 0;
-        if(color==Logic.colorCanMove) {
-            int y = yposition;
-            boolean anotherColorDetector = false;
-            for (int x = xposition; x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1; x++, y++) {
-                if (tiles[y + 1][x + 1].hasNoPiece()) {
-                    if(anotherColorDetector)
-                    {
-                        makeHighlighted(y+1,x+1);
-                    }
-                }
-                else {
-                    if (tiles[y + 1][x + 1].piece.color ==Logic.colorCanMove) {
-                        break;
-                    } else {
-                        y++;
-                        x++;
-                        if (!anotherColorDetector && x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1 && tiles[y + 1][x + 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y + 1, x + 1);
-                            captureCounter++;
-                        } else {
-                            break;
-                        }
-                    }
-                }
 
-            }
-            anotherColorDetector = false;
-            y = yposition;
-            for (int x = xposition; x > 0 && y < Checkers.board.BOARD_HEIGHT - 1; x--, y++) {
-                if (tiles[y + 1][x - 1].hasNoPiece()){
-                    if(anotherColorDetector)
-                        makeHighlighted(y + 1, x - 1);
-                }
-                else {
-                    if (tiles[y + 1][x - 1].piece.color == Logic.colorCanMove) {
-                        break;
-                    } else {
-                        y++;
-                        x--;
-                        if (!anotherColorDetector && y < Checkers.board.BOARD_HEIGHT - 1 && x > 0 && tiles[y + 1][x - 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y + 1, x - 1);
-                            captureCounter++;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-            anotherColorDetector = false;
-            y = yposition;
-            for (int x = xposition; x < Checkers.board.BOARD_WIDTH - 1 && y > 0; x++, y--) {
-                if (tiles[y - 1][x + 1].hasNoPiece()){
-                    if(anotherColorDetector)
-                    {
-                        makeHighlighted(y - 1, x + 1);
-                    }
-                }
-                else {
-                    if (tiles[y - 1][x + 1].piece.color == Logic.colorCanMove) {
-                        break;
-                    } else {
-                        y--;
-                        x++;
-                        if (!anotherColorDetector && y > 0 && x < Checkers.board.BOARD_WIDTH - 1 && tiles[y - 1][x + 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y - 1, x + 1);
-                            captureCounter++;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
-            anotherColorDetector = false;
-            y = yposition;
-            for (int x = xposition; x > 0 && y > 0; x--, y--) {
-                if (tiles[y - 1][x - 1].hasNoPiece()) {
-                    if(anotherColorDetector)
-                        makeHighlighted(y - 1, x - 1);
-                }
-                else {
-                    if (tiles[y - 1][x - 1].piece.color == Logic.colorCanMove) {
-                        break;
-                    } else {
-                        y--;
-                        x--;
-                        if (!anotherColorDetector && y > 0 && x > 0 && tiles[y - 1][x - 1].hasNoPiece()) {
-                            anotherColorDetector = true;
-                            makeHighlighted(y - 1, x - 1);
-                            captureCounter++;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-            }
+        if(color==Logic.colorCanMove) {
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.UP);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.DOWN);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.UP);
+            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.DOWN);
         }
         return captureCounter;
     }
@@ -414,7 +317,7 @@ class Piece extends Circle {
         }
         removeHandlerMove();
     };
-    EventHandler<MouseEvent> path = new EventHandler<MouseEvent>() {
+    EventHandler<MouseEvent> path = new EventHandler<>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
 
