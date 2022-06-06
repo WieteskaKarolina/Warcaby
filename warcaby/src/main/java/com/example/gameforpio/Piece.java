@@ -103,32 +103,53 @@ class Piece extends Circle {
         return false;
     }
 
-    int possibleMovesPiece() {
-        int moveCounter = 0;
-        if (color == Colors.DARK) {
-            if (yCurrent < Checkers.board.BOARD_HEIGHT - 1) {
-                if (xCurrent < Checkers.board.BOARD_WIDTH - 1 && tiles[yCurrent + 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent + 1, xCurrent + 1);
-                    moveCounter++;
-                }
-
-                if (xCurrent > 0 && tiles[yCurrent + 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent + 1, xCurrent - 1);
-                    moveCounter++;
-                }
+    boolean check(int x, int y, int horizontal, int vertical){
+        if(horizontal<0){
+            if(vertical<0) {
+                return (x > 0 && y > 0);
             }
-        } else {
-            if (yCurrent > 0) {
-                if (xCurrent < Checkers.board.BOARD_WIDTH - 1 && tiles[yCurrent - 1][xCurrent + 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent - 1, xCurrent + 1);
-                    moveCounter++;
-                }
-                if (xCurrent > 0 && tiles[yCurrent - 1][xCurrent - 1].hasNoPiece() && color == Logic.colorCanMove) {
-                    makeHighlighted(yCurrent - 1, xCurrent - 1);
-                    moveCounter++;
-                }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 1 && x > 0);
             }
         }
+        if(horizontal>0){
+            if(vertical<0) {
+                return (x < Checkers.board.BOARD_WIDTH - 1 && y > 0);
+            }
+            else{
+                return (y < Checkers.board.BOARD_HEIGHT - 1 && x < Checkers.board.BOARD_WIDTH - 1);
+            }
+        }
+        return false;
+    }
+
+    int movesPiece(int horizontal, int vertical){
+        int movesCounter = 0;
+        if (check(xCurrent, yCurrent, horizontal, vertical) && tiles[yCurrent + vertical][ xCurrent + horizontal].hasNoPiece() && color == Logic.colorCanMove){
+            makeHighlighted(yCurrent + vertical, xCurrent + horizontal);
+            movesCounter++;
+
+        }
+        return  movesCounter;
+    }
+
+    int possibleMovesPiece() {
+        int moveCounter = 0;
+        final int LEFT = -1;
+        final int RIGHT = 1;
+        final int DOWN = -1;
+        final int UP = 1;
+
+        if (color == Colors.DARK) {
+            moveCounter+=movesPiece(RIGHT, UP);
+            moveCounter+=movesPiece(LEFT, UP);
+        }
+        if (color == Colors.LIGHT){
+            moveCounter+=movesPiece(RIGHT, DOWN);
+            moveCounter+=movesPiece(LEFT, DOWN);
+        }
+
+
         return moveCounter;
 
     }
