@@ -253,6 +253,110 @@ class Piece extends Circle {
         return possibleBeatsCounter;
     }
 
+    int possibleCapturesQueen(int yposition,int xposition) {
+        int captureCounter = 0;
+        if(color==Logic.colorCanMove) {
+            int y = yposition;
+            boolean anotherColorDetector = false;
+            for (int x = xposition; x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1; x++, y++) {
+                if (tiles[y + 1][x + 1].hasNoPiece()) {
+                    if(anotherColorDetector)
+                    {
+                        makeHighlighted(y+1,x+1);
+                    }
+                }
+                else {
+                    if (tiles[y + 1][x + 1].piece.color ==Logic.colorCanMove) {
+                        break;
+                    } else {
+                        y++;
+                        x++;
+                        if (!anotherColorDetector && x < Checkers.board.BOARD_WIDTH - 1 && y < Checkers.board.BOARD_HEIGHT - 1 && tiles[y + 1][x + 1].hasNoPiece()) {
+                            anotherColorDetector = true;
+                            makeHighlighted(y + 1, x + 1);
+                            captureCounter++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
+            }
+            anotherColorDetector = false;
+            y = yposition;
+            for (int x = xposition; x > 0 && y < Checkers.board.BOARD_HEIGHT - 1; x--, y++) {
+                if (tiles[y + 1][x - 1].hasNoPiece()){
+                    if(anotherColorDetector)
+                        makeHighlighted(y + 1, x - 1);
+                }
+                else {
+                    if (tiles[y + 1][x - 1].piece.color == Logic.colorCanMove) {
+                        break;
+                    } else {
+                        y++;
+                        x--;
+                        if (!anotherColorDetector && y < Checkers.board.BOARD_HEIGHT - 1 && x > 0 && tiles[y + 1][x - 1].hasNoPiece()) {
+                            anotherColorDetector = true;
+                            makeHighlighted(y + 1, x - 1);
+                            captureCounter++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+            anotherColorDetector = false;
+            y = yposition;
+            for (int x = xposition; x < Checkers.board.BOARD_WIDTH - 1 && y > 0; x++, y--) {
+                if (tiles[y - 1][x + 1].hasNoPiece()){
+                    if(anotherColorDetector)
+                    {
+                        makeHighlighted(y - 1, x + 1);
+                    }
+                }
+                else {
+                    if (tiles[y - 1][x + 1].piece.color == Logic.colorCanMove) {
+                        break;
+                    } else {
+                        y--;
+                        x++;
+                        if (!anotherColorDetector && y > 0 && x < Checkers.board.BOARD_WIDTH - 1 && tiles[y - 1][x + 1].hasNoPiece()) {
+                            anotherColorDetector = true;
+                            makeHighlighted(y - 1, x + 1);
+                            captureCounter++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+            anotherColorDetector = false;
+            y = yposition;
+            for (int x = xposition; x > 0 && y > 0; x--, y--) {
+                if (tiles[y - 1][x - 1].hasNoPiece()) {
+                    if(anotherColorDetector)
+                        makeHighlighted(y - 1, x - 1);
+                }
+                else {
+                    if (tiles[y - 1][x - 1].piece.color == Logic.colorCanMove) {
+                        break;
+                    } else {
+                        y--;
+                        x--;
+                        if (!anotherColorDetector && y > 0 && x > 0 && tiles[y - 1][x - 1].hasNoPiece()) {
+                            anotherColorDetector = true;
+                            makeHighlighted(y - 1, x - 1);
+                            captureCounter++;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return captureCounter;
+    }
+
     void clearBoard() {
         for (int y = 0; y < Checkers.board.BOARD_HEIGHT; y++) {
             for (int x = 0; x < Checkers.board.BOARD_WIDTH; x++) {
@@ -260,7 +364,8 @@ class Piece extends Circle {
                 tiles[y][x].setStrokeWidth(2);
             }
         }
-    }    EventHandler<MouseEvent> move = ev -> {
+    }
+    EventHandler<MouseEvent> move = ev -> {
         if (Logic.clicked) {
             clearBoard();
             removeHandlerMove();
@@ -268,8 +373,22 @@ class Piece extends Circle {
         Tile tile = (Tile) ev.getSource();
 
         if (!isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
-        else Logic.canBeatQueen = queenBeat(tile.y, tile.x);
+        else Logic.isBeatPiece = queenBeat(tile.y, tile.x);
+
         Checkers.movePieceFromOneTileToAnother(Logic.actualPieceY, Logic.actualPieceX, tile.y, tile.x);
+        int beats = 0;
+        if (Logic.isBeatPiece && !tile.piece.isQueen) {
+            beats = possibleCapture(tile.y, tile.x);
+            Logic.actualPieceY=tile.y;
+            Logic.actualPieceX=tile.x;
+        }
+        if(Logic.isBeatPiece && tile.piece.isQueen)
+        {
+            //  System.out.println(possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX));
+            beats = possibleCapturesQueen(tile.y, tile.x);
+            Logic.actualPieceY=tile.y;
+            Logic.actualPieceX=tile.x;
+        }
         //Przemiana w Damke
 
         if (tile.y == 0 && color == Colors.LIGHT) {
@@ -284,10 +403,6 @@ class Piece extends Circle {
 
         Logic.clicked = false;
 
-        int beats = 0;
-        if (Logic.isBeatPiece && !tile.piece.isQueen) {
-            beats = possibleCapture(tile.y, tile.x);
-        }
         if (beats == 0) {
             if (Logic.colorCanMove == Colors.DARK) {
                 Logic.colorCanMove = Colors.LIGHT;
@@ -296,14 +411,9 @@ class Piece extends Circle {
             }
             Checkers.infoAboutWhoMoves();
             Logic.isBeatPiece = false;
-            Logic.canBeatQueen = false;
         }
         removeHandlerMove();
     };
-
-
-
-
     EventHandler<MouseEvent> path = new EventHandler<MouseEvent>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
@@ -313,7 +423,10 @@ class Piece extends Circle {
                 removeHandlerMove();
             }
             if (isQueen) {
-                possibleMovesQueen();
+                if (possibleCapturesQueen(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
+                    possibleMovesQueen();
+                }
+
             } else {
                 if (possibleCapture(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
                     possibleMovesPiece();

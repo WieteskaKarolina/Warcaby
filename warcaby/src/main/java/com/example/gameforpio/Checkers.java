@@ -104,9 +104,16 @@ public class Checkers extends Application {
         }
         //
         tileMap.getChildren().add(board.tiles[y][x].piece);
+        if (Logic.isBeatPiece) {
+            if(board.tiles[oldY][oldX].piece.isQueen)
+            {
+                removePieceFromTile(Logic.pieceToRemoveY, Logic.pieceToRemoveX);
+            }
+            else{
+                removePieceFromTile((y + oldY) / 2, (x + oldX) / 2);
+            }
+        }
         removePieceFromTile(oldY, oldX);
-        if (Logic.isBeatPiece) removePieceFromTile((y + oldY) / 2, (x + oldX) / 2);
-        if (Logic.canBeatQueen) removePieceFromTile(Logic.pieceToRemoveY, Logic.pieceToRemoveX);
     }
 
     public static void main(String[] args) {
