@@ -66,8 +66,9 @@ class Piece extends Circle {
     public boolean canIBeat(int y, int x, int newY, int newX) {
 
 
-        if (tiles[(y + newY) / 2][(x + newX) / 2].piece == null || tiles[y][x].piece == null)
+        if (tiles[(y + newY) / 2][(x + newX) / 2].piece == null || tiles[y][x].piece == null) {
             return false;
+        }
         return (tiles[(y + newY) / 2][(x + newX) / 2].piece.color != tiles[y][x].piece.color) && tiles[newY][newX].hasNoPiece() && !tiles[(y + newY) / 2][(x + newX) / 2].hasNoPiece();
     }
 
@@ -252,10 +253,10 @@ class Piece extends Circle {
         int captureCounter = 0;
 
         if(color==Logic.colorCanMove) {
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.UP);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.LEFT,Logic.DOWN);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.UP);
-            captureCounter=captureCounter+capturesQueen(yposition,xposition,Logic.RIGHT,Logic.DOWN);
+            captureCounter+=capturesQueen(yposition,xposition,Logic.LEFT,Logic.UP);
+            captureCounter+=capturesQueen(yposition,xposition,Logic.LEFT,Logic.DOWN);
+            captureCounter+=capturesQueen(yposition,xposition,Logic.RIGHT,Logic.UP);
+            captureCounter+=capturesQueen(yposition,xposition,Logic.RIGHT,Logic.DOWN);
         }
         return captureCounter;
     }
@@ -278,7 +279,7 @@ class Piece extends Circle {
         {
             return;
         }
-        if (!isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
+        if (!tiles[Logic.actualPieceY][Logic.actualPieceX].piece.isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
         else Logic.isBeatPiece = queenBeat(tile.y, tile.x);
 
         Checkers.movePieceFromOneTileToAnother(Logic.actualPieceY, Logic.actualPieceX, tile.y, tile.x);
@@ -291,7 +292,6 @@ class Piece extends Circle {
         }
         if(Logic.isBeatPiece && tile.piece.isQueen)
         {
-            //  System.out.println(possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX));
             beats = possibleCapturesQueen(tile.y, tile.x);
             Logic.actualPieceY=tile.y;
             Logic.actualPieceX=tile.x;
@@ -308,10 +308,8 @@ class Piece extends Circle {
         }
 
         Logic.clicked = false;
-        System.out.println(Logic.isBeatPiece);
 
         if (beats == 0) {
-            System.out.println("Zmiana tury");
             if (Logic.colorCanMove == Colors.DARK) {
                 Logic.colorCanMove = Colors.LIGHT;
             } else {
@@ -325,26 +323,42 @@ class Piece extends Circle {
     EventHandler<MouseEvent> path = new EventHandler<>() {
         @Override
         public void handle(MouseEvent mouseEvent) {
-
             if (Logic.clicked) {
                 clearBoard();
                 removeHandlerMove();
             }
-            if (isQueen) {
-                if (possibleCapturesQueen(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
-                    possibleMovesQueen();
-                }
-
-            } else {
-                if (possibleCapture(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
-                    possibleMovesPiece();
-                }
+            if(!Logic.isBeatPiece) {
+                movePieces();
             }
-
-            Logic.actualPieceX = xCurrent;
-            Logic.actualPieceY = yCurrent;
+            else{
+                capturePieces();
+            }
             Logic.clicked = true;
         }
     };
+
+    private void capturePieces() {
+        if(tiles[Logic.actualPieceY][Logic.actualPieceX].piece.isQueen) {
+            possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX);
+        }
+        else {
+            possibleCapture(Logic.actualPieceY, Logic.actualPieceX);
+        }
+    }
+
+    private void movePieces() {
+        Logic.actualPieceX = xCurrent;
+        Logic.actualPieceY = yCurrent;
+        if (isQueen) {
+            if(possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX)==0&&!Logic.isBeatPiece){
+                possibleMovesQueen();
+            }
+        } else {
+
+            if (possibleCapture(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
+                possibleMovesPiece();
+            }
+        }
+    }
 
 }
