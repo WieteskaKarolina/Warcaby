@@ -328,26 +328,37 @@ class Piece extends Circle {
                 removeHandlerMove();
             }
             if(!Logic.isBeatPiece) {
-                Logic.actualPieceX = xCurrent;
-                Logic.actualPieceY = yCurrent;
-                if (isQueen) {
-                    if(possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX)==0&&!Logic.isBeatPiece){
-                        possibleMovesQueen();
-                    }
-                } else {
-
-                    if (possibleCapture(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
-                        possibleMovesPiece();
-                    }
-                }
+                movePieces();
             }
             else{
-                if(! tiles[Logic.actualPieceY][Logic.actualPieceX].piece.isQueen) {
-                    possibleCapture(Logic.actualPieceY, Logic.actualPieceX);
-                }
+                capturePieces();
             }
             Logic.clicked = true;
         }
     };
+
+    private void capturePieces() {
+        if(tiles[Logic.actualPieceY][Logic.actualPieceX].piece.isQueen) {
+            possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX);
+        }
+        else {
+            possibleCapture(Logic.actualPieceY, Logic.actualPieceX);
+        }
+    }
+
+    private void movePieces() {
+        Logic.actualPieceX = xCurrent;
+        Logic.actualPieceY = yCurrent;
+        if (isQueen) {
+            if(possibleCapturesQueen(Logic.actualPieceY, Logic.actualPieceX)==0&&!Logic.isBeatPiece){
+                possibleMovesQueen();
+            }
+        } else {
+
+            if (possibleCapture(yCurrent, xCurrent) == 0 && !Logic.isBeatPiece) {
+                possibleMovesPiece();
+            }
+        }
+    }
 
 }

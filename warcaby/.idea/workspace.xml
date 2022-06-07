@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f78a4ea0-8f9e-47bc-b66d-fbf6e3aec265" name="Changes" comment="Poprawa wyglądu kodu">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/example/gameforpio/Piece.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/gameforpio/Piece.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,7 +63,7 @@
       <updated>1654015121232</updated>
       <workItem from="1654015127337" duration="10711000" />
       <workItem from="1654190401354" duration="101000" />
-      <workItem from="1654606211696" duration="2648000" />
+      <workItem from="1654606211696" duration="3918000" />
     </task>
     <task id="LOCAL-00001" summary="Poprawa wyglądu kodu">
       <created>1654024695169</created>
