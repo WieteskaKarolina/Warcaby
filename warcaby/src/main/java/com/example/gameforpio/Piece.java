@@ -279,7 +279,7 @@ class Piece extends Circle {
         {
             return;
         }
-        if (!isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
+        if (!tiles[Logic.actualPieceY][Logic.actualPieceX].piece.isQueen) Logic.isBeatPiece = abs(Logic.actualPieceY - tile.y) == 2;
         else Logic.isBeatPiece = queenBeat(tile.y, tile.x);
 
         Checkers.movePieceFromOneTileToAnother(Logic.actualPieceY, Logic.actualPieceX, tile.y, tile.x);
