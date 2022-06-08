@@ -16,4 +16,7 @@ class Logic {
     final static int RIGHT_CAPTURE = 2;
     final static int DOWN_CAPTURE = -2;
     final static int UP_CAPTURE = 2;
+    final static int NUMBER_OF_PIECES = 12;
+    static int NUMBER_OF_WHITE_PIECES = 0;
+    static int NUMBER_OF_DARK_PIECES = 0;
 }
