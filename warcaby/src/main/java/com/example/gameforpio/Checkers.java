@@ -14,6 +14,7 @@ public class Checkers extends Application {
     static AnchorPane tileMap = new AnchorPane();
     static Board board = new Board();
     static Text infoText = new Text();
+    static Text statisticText = new Text();
 
     public static void removePieceFromTile(int y, int x) {
         tileMap.getChildren().remove(board.tiles[y][x].piece);
@@ -42,6 +43,9 @@ public class Checkers extends Application {
                 }
             }
         }
+        Logic.NUMBER_OF_DARK_PIECES = darkPieces;
+        Logic.NUMBER_OF_WHITE_PIECES = whitePieces;
+
         if (whitePieces == 0 && darkPieces != 0) {
             return GameResult.DARK_WINS;
         } else if (darkPieces == 0 && whitePieces != 0) {
@@ -55,35 +59,59 @@ public class Checkers extends Application {
     public static GameResult handleEndGame() {
         GameResult result = isEndGame();
         if (result == GameResult.DARK_WINS) {
-            writeText("DARK WINS", Color.RED, Color.TRANSPARENT);
+            writeText("DARK WINS", Color.RED, Color.TRANSPARENT, 20.0f, 350.0f );
         } else if (result == GameResult.WHITE_WINS) {
-            writeText("WHITE WINS", Color.RED, Color.TRANSPARENT);
+            writeText("WHITE WINS", Color.RED, Color.TRANSPARENT, 20.0f, 350.0f );
         } else if (result == GameResult.DRAW) {
-            writeText("DRAW", Color.RED, Color.TRANSPARENT);
+            writeText("DRAW", Color.RED, Color.TRANSPARENT, 20.0f, 350.0f );
         }
         return result;
     }
 
-    private static void writeText(String text, Color color, Color stroke) {
+    private static void writeText(String text, Color color, Color stroke, float positionX, float positionY) {
         infoText.setText(text);
         infoText.setFill(color);
         infoText.setStroke(stroke);
-        infoText.setX(20.0f);
-        infoText.setY(350.0f);
+        infoText.setX(positionX);
+        infoText.setY(positionY);
         infoText.setTextAlignment(TextAlignment.CENTER);
         infoText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 40));
         tileMap.getChildren().add(infoText);
     }
 
+    private static void writeStatistics(String text, Color color, Color stroke, float positionX, float positionY) {
+        statisticText.setText(text);
+        statisticText.setFill(color);
+        statisticText.setStroke(stroke);
+        statisticText.setX(positionX);
+        statisticText.setY(positionY);
+        statisticText.setTextAlignment(TextAlignment.CENTER);
+        statisticText.setFont(Font.font("verdana", FontWeight.BOLD, FontPosture.REGULAR, 30));
+        tileMap.getChildren().add(statisticText);
+    }
+
+    public static void statistics(){
+        tileMap.getChildren().remove(statisticText);
+        writeStatistics("White left:"+ Logic.NUMBER_OF_WHITE_PIECES+ "\n" +
+        "White captured:"+ (Logic.NUMBER_OF_PIECES-Logic.NUMBER_OF_WHITE_PIECES)+ "\n" +
+        "Dark left:"+ Logic.NUMBER_OF_DARK_PIECES + "\n" +
+        "Dark captured:"+ (Logic.NUMBER_OF_PIECES-Logic.NUMBER_OF_DARK_PIECES), Color.WHITE, Color.BLACK, 970.0f, 300.0f);
+
+    }
+
     public static void infoAboutWhoMoves() {
         tileMap.getChildren().remove(infoText);
-        if (handleEndGame() != GameResult.CONTINUE) return;
+        if (handleEndGame() != GameResult.CONTINUE) {
+            statistics();
+            return;
+        }
         if (Logic.colorCanMove == Colors.LIGHT) {
-            writeText("LIGHT MOVE!", Color.WHITE, Color.BLACK);
+            writeText("LIGHT MOVE!", Color.WHITE, Color.BLACK, 20.0f, 350.0f );
 
         } else {
-            writeText("DARK MOVE!", Color.BLACK, Color.WHITE);
+            writeText("DARK MOVE!", Color.BLACK, Color.WHITE, 20.0f, 350.0f );
         }
+        statistics();
     }
 
     public static void movePieceFromOneTileToAnother(int oldY, int oldX, int y, int x) {
